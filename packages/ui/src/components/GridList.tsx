@@ -33,7 +33,7 @@ export function GridList<T extends object>({ children, ...props }: AriaGridListP
 }
 
 export function GridListItem({ children, className, ...props }: AriaGridListItemProps) {
-    let textValue = typeof children === 'string' ? children : undefined
+    const textValue = typeof children === 'string' ? children : undefined
     return (
         <AriaGridListItem
             textValue={textValue}

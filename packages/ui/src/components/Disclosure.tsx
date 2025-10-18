@@ -23,7 +23,7 @@ export interface DisclosureProps extends AriaDisclosureProps {
 }
 
 function Disclosure({ children, className, ...props }: DisclosureProps) {
-    let isInGroup = React.useContext(DisclosureGroupStateContext) !== null
+    const isInGroup = React.useContext(DisclosureGroupStateContext) !== null
     return (
         <AriaDisclosure
             {...props}
