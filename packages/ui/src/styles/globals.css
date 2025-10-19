@@ -124,6 +124,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --shadow-sm: 0px 1px 2px 0px oklch(0 0 0 / 5%);
   --shadow-popover: var(--popover-shadow);
+  --font-family-sans: var(--font-open-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 @layer base {
