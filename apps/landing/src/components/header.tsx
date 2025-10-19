@@ -4,10 +4,19 @@ import { useState, useEffect } from "react";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [hideHeader, setHideHeader] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
+
+      // Ẩn header khi scroll tới Our Products section
+      const productsSection = document.querySelector('section.min-h-screen.py-20');
+      if (productsSection) {
+        const rect = productsSection.getBoundingClientRect();
+        // Ẩn header khi products section vào viewport
+        setHideHeader(rect.top < 100 && rect.bottom > 0);
+      }
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -16,8 +25,8 @@ export default function Header() {
   return (
     <motion.header
       initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      animate={{ y: hideHeader ? -100 : 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? "bg-black/80 backdrop-blur-lg border-b border-white/10"
