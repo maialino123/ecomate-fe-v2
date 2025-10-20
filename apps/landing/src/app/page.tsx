@@ -4,8 +4,13 @@ import HeroBanner from '@/components/hero-banner'
 import TourSection from '@/components/tour-section'
 import OurProducts from '@/components/our-products'
 import ConnectivityMap from '@/components/connectivity-map'
+import Footer from '@/components/footer'
+import MobileDock from '@/components/mobile-dock'
+import { TransitionProvider, useTransition } from '@/contexts/transition-context'
 
-export default function Page() {
+function PageContent() {
+    const { isTransitioning } = useTransition()
+
     return (
         <div className="relative">
             {/* Fixed Background */}
@@ -14,17 +19,29 @@ export default function Page() {
             {/* Fixed Header */}
             <Header />
 
+            {/* Mobile Floating Dock - Chỉ hiển thị trên mobile */}
+            <MobileDock />
+
             {/* Hero Banner - Full screen */}
             <HeroBanner />
 
             {/* 3D Tour Section - Kích hoạt sau khi scroll qua hero */}
             <TourSection />
 
-            {/* Our Products Section - With Glowing Effect */}
-            <OurProducts />
-
-            {/* Connectivity Map - Shipping Coverage */}
-            <ConnectivityMap />
+            {/* Our Products Section - Ẩn khi đang transition */}
+            <div style={{ opacity: isTransitioning ? 0 : 1, transition: 'opacity 0.3s' }}>
+                <OurProducts />
+                <ConnectivityMap />
+                <Footer />
+            </div>
         </div>
+    )
+}
+
+export default function Page() {
+    return (
+        <TransitionProvider>
+            <PageContent />
+        </TransitionProvider>
     )
 }

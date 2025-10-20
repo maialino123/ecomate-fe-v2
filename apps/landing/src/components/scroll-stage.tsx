@@ -198,22 +198,26 @@ function CameraScrollController({ onDebugInfo }: { onDebugInfo: (info: Partial<D
                         // Bỏ qua tất cả triggers trước khi initialized
                         if (!hasInitialized.current) return
 
-                        // Chỉ animate khi thực sự scroll đến section mới (không phải lần đầu load)
-                        if (entry.isIntersecting && !isAnimating.current && currentWaypointIndex.current !== index) {
+                        // Chỉ animate khi thực sự scroll đến section mới
+                        if (entry.isIntersecting && currentWaypointIndex.current !== index) {
                             // Section này đang được view, animate camera đến waypoint tương ứng
                             if (DEBUG_MODE) {
                                 console.log(`📍 Snap to ${waypoint.sec} (waypoint ${index})`)
                             }
 
+                            // Cancel ongoing animations trước khi start animation mới
+                            gsap.killTweensOf(camera.position)
+                            gsap.killTweensOf(lookAt.current)
+
                             isAnimating.current = true
                             currentWaypointIndex.current = index
 
-                            // Animate camera với GSAP
+                            // Animate camera với GSAP - giảm duration để responsive hơn
                             gsap.to(camera.position, {
                                 x: waypoint.pos.x,
                                 y: waypoint.pos.y,
                                 z: waypoint.pos.z,
-                                duration: 1,
+                                duration: 0.6,
                                 ease: 'power2.inOut',
                                 onComplete: () => {
                                     isAnimating.current = false
@@ -226,7 +230,7 @@ function CameraScrollController({ onDebugInfo }: { onDebugInfo: (info: Partial<D
                                 x: waypoint.look.x,
                                 y: waypoint.look.y,
                                 z: waypoint.look.z,
-                                duration: 1,
+                                duration: 0.6,
                                 ease: 'power2.inOut',
                                 onUpdate: () => {
                                     lookAt.current.set(tempLookAt.x, tempLookAt.y, tempLookAt.z)
@@ -236,7 +240,7 @@ function CameraScrollController({ onDebugInfo }: { onDebugInfo: (info: Partial<D
                     })
                 },
                 {
-                    threshold: 0.5, // Trigger khi 50% section vào viewport
+                    threshold: 0.6, // Trigger khi 60% section vào viewport - chặt chẽ hơn
                 },
             )
 
@@ -304,6 +308,7 @@ export default function ScrollStage() {
             )}
             <Canvas
                 className="absolute inset-0"
+                style={{ pointerEvents: 'none' }}
                 camera={{
                     position: USE_ORBIT_CONTROLS
                         ? [25, 25, 25]

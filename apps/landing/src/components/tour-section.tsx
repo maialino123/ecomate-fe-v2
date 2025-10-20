@@ -1,9 +1,11 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import dynamic from "next/dynamic";
+import { useTransition } from "@/contexts/transition-context";
+import { useTourStore, type TourSection } from "@/stores/tour-store";
 
 const ScrollStage = dynamic(() => import("@/components/scroll-stage"), {
   ssr: false,
@@ -12,6 +14,7 @@ const ScrollStage = dynamic(() => import("@/components/scroll-stage"), {
 gsap.registerPlugin(ScrollTrigger);
 
 export default function TourSection() {
+  const { setIsTransitioning } = useTransition();
   const sectionRef = useRef<HTMLDivElement>(null);
   const circleRef = useRef<HTMLDivElement>(null);
   const circleCollapseRef = useRef<HTMLDivElement>(null);
@@ -22,14 +25,82 @@ export default function TourSection() {
   const kitchenTextRef = useRef<HTMLDivElement>(null);
   const bathTextRef = useRef<HTMLDivElement>(null);
   const bedTextRef = useRef<HTMLDivElement>(null);
-  const hasCollapsedRef = useRef(false);
-  const isActivatedRef = useRef(false);
 
-  const [isActivated, setIsActivated] = useState(false);
-  const [showCircleReveal, setShowCircleReveal] = useState(false);
-  const [showCircleCollapse, setShowCircleCollapse] = useState(false);
-  const [showCircleExit, setShowCircleExit] = useState(false);
-  const [showCircleReentry, setShowCircleReentry] = useState(false);
+  // Zustand store
+  const {
+    isActivated,
+    currentSection,
+    circleAnimation,
+    showCanvas,
+    activate,
+    deactivate,
+    setCurrentSection,
+    setCircleAnimation,
+    setShowCanvas,
+    reset,
+  } = useTourStore();
+
+  // Helper function để ẩn tất cả text sections
+  const hideAllTexts = useCallback(() => {
+    [livingTextRef, kitchenTextRef, bathTextRef, bedTextRef].forEach(ref => {
+      if (ref.current) {
+        gsap.killTweensOf(ref.current); // Kill any ongoing animations
+        gsap.to(ref.current, { opacity: 0, duration: 0.2 });
+      }
+    });
+  }, []);
+
+  // Helper function để hiển thị text section cụ thể
+  const showText = useCallback((section: TourSection) => {
+    // Ẩn tất cả trước
+    [livingTextRef, kitchenTextRef, bathTextRef, bedTextRef].forEach(ref => {
+      if (ref.current) {
+        gsap.killTweensOf(ref.current);
+        gsap.to(ref.current, { opacity: 0, duration: 0.2 });
+      }
+    });
+
+    // Hiển thị section cụ thể
+    let ref;
+    switch (section) {
+      case 'living': ref = livingTextRef; break;
+      case 'kitchen': ref = kitchenTextRef; break;
+      case 'bath': ref = bathTextRef; break;
+      case 'bed': ref = bedTextRef; break;
+      default: return;
+    }
+
+    if (ref.current) {
+      gsap.killTweensOf(ref.current); // Kill any ongoing animations
+      gsap.to(ref.current, { opacity: 1, duration: 0.4 });
+    }
+  }, []);
+
+  // Effect để đảm bảo text luôn ẩn khi không trong tour section
+  useEffect(() => {
+    if (!isActivated || currentSection === 'none') {
+      hideAllTexts();
+    }
+  }, [isActivated, currentSection, hideAllTexts]);
+
+  // Effect để cleanup khi unmount hoặc page navigation
+  useEffect(() => {
+    return () => {
+      // Force hide all texts on unmount
+      [livingTextRef, kitchenTextRef, bathTextRef, bedTextRef].forEach(ref => {
+        if (ref.current) {
+          gsap.killTweensOf(ref.current);
+          ref.current.style.opacity = '0';
+        }
+      });
+
+      // Force hide canvas
+      if (canvasWrapRef.current) {
+        gsap.killTweensOf(canvasWrapRef.current);
+        canvasWrapRef.current.style.opacity = '0';
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -39,8 +110,9 @@ export default function TourSection() {
       trigger: sectionRef.current,
       start: "top 50%",
       onEnter: () => {
-        // Không activate nếu đang active rồi
-        if (isActivatedRef.current) {
+        // Đọc state trực tiếp từ store thay vì closure
+        const currentState = useTourStore.getState();
+        if (currentState.isActivated) {
           console.log('⏭️ Already activated, skipping');
           return;
         }
@@ -54,40 +126,11 @@ export default function TourSection() {
             top: tourSection.offsetTop,
             behavior: 'smooth'
           });
-          console.log('📜 Snapping to tour section');
         }
 
-        // Đợi snap animation xong rồi activate 3D
-        setTimeout(() => {
-          const scrollRoot = document.getElementById('scroll-root');
-          if (scrollRoot) {
-            // Scroll tới sec-reveal bên trong tour section
-            const revealSection = document.getElementById('sec-reveal');
-            if (revealSection) {
-              scrollRoot.scrollTo({
-                top: revealSection.offsetTop,
-                behavior: 'smooth'
-              });
-            }
-          }
-        }, 600);
-
-        // Reset collapse flag khi activate lại
-        hasCollapsedRef.current = false;
-        isActivatedRef.current = true;
-        setIsActivated(true);
-        setShowCircleReveal(true);
-
-        // Fade in canvas với delay để circular reveal che trước
-        if (canvasWrapRef.current) {
-          gsap.to(canvasWrapRef.current, {
-            opacity: 1,
-            duration: 0.8,
-            delay: 0.6, // Đợi circle expand một chút
-            onStart: () => console.log('🌟 Canvas fading in'),
-            onComplete: () => console.log('✅ Canvas visible')
-          });
-        }
+        // Set circle animation và activate
+        setCircleAnimation('reveal');
+        activate();
 
         // Chờ circleRef render rồi mới animate
         requestAnimationFrame(() => {
@@ -98,13 +141,9 @@ export default function TourSection() {
           // Circular reveal animation
           const tl = gsap.timeline({
             onComplete: () => {
-              console.log("✅ Circle animation complete, hiding circle");
-              // Ẩn circle sau khi animation xong
-              setShowCircleReveal(false);
-
-              // RE-ENABLE SCROLL sau khi reveal xong
+              console.log("✅ Circle reveal complete");
+              setCircleAnimation('none');
               document.body.style.overflow = 'auto';
-              console.log('🔓 Scroll re-enabled after reveal');
             }
           });
 
@@ -119,14 +158,14 @@ export default function TourSection() {
             ease: "power2.inOut",
           });
 
-          // Backup: Ẩn circle và re-enable scroll sau 2 giây dù có lỗi
-          setTimeout(() => {
-            setShowCircleReveal(false);
-            if (document.body.style.overflow === 'hidden') {
-              document.body.style.overflow = 'auto';
-              console.log('🔓 Scroll re-enabled (backup)');
-            }
-          }, 2000);
+          // Fade in canvas
+          if (canvasWrapRef.current) {
+            gsap.to(canvasWrapRef.current, {
+              opacity: 1,
+              duration: 0.8,
+              delay: 0.6,
+            });
+          }
         });
       },
       markers: false,
@@ -155,206 +194,124 @@ export default function TourSection() {
       start: "top center",
       end: "top top",
       onLeaveBack: () => {
-        console.log('🔙 onLeaveBack triggered, isActivated:', isActivatedRef.current, 'hasCollapsed:', hasCollapsedRef.current);
-
-        // Prevent re-triggering
-        if (hasCollapsedRef.current || !isActivatedRef.current) return;
-        hasCollapsedRef.current = true;
+        // Đọc state từ store để avoid stale closure
+        const currentState = useTourStore.getState();
+        if (!currentState.isActivated || currentState.circleAnimation !== 'none') return;
 
         console.log('🔵 Starting circular collapse animation');
 
-        // DISABLE SCROLL để ngăn người dùng scroll trong lúc animation
+        // Disable scroll
         document.body.style.overflow = 'hidden';
-        console.log('🔒 Scroll disabled');
 
-        // ẨN CANVAS NGAY LẬP TỨC để tránh nhấp nháy
+        // Ẩn canvas và text ngay lập tức
         if (canvasWrapRef.current) {
           canvasWrapRef.current.style.opacity = '0';
-          console.log('⚡ Canvas hidden immediately');
         }
+        hideAllTexts();
+        setCurrentSection('none');
 
-        // Khi scroll back lên hero → Trigger circular collapse
-        setShowCircleCollapse(true);
+        // Trigger circular collapse
+        setCircleAnimation('collapse');
 
         requestAnimationFrame(() => {
           if (!circleCollapseRef.current) return;
 
           const circle = circleCollapseRef.current;
 
-          // Circular collapse animation - Bắt đầu từ full screen thu về
           const tl = gsap.timeline({
             onComplete: () => {
               console.log('✅ Circular collapse complete');
-              setShowCircleCollapse(false);
-              isActivatedRef.current = false;
-
-              // RE-ENABLE SCROLL sau khi animation xong
+              setCircleAnimation('none');
+              deactivate();
               document.body.style.overflow = 'auto';
-              console.log('🔓 Scroll re-enabled');
             }
           });
 
-          // Step 1: Circle xuất hiện từ màn hình đầy (che hết canvas)
           tl.fromTo(
             circle,
-            { scale: 50, opacity: 1 }, // Bắt đầu từ full screen, VISIBLE
+            { scale: 50, opacity: 1 },
             { scale: 1, opacity: 1, duration: 0.8, ease: "power2.inOut" }
-          )
-          // Step 2: Circle thu nhỏ và biến mất
-          .to(circle, {
+          ).to(circle, {
             scale: 0,
             opacity: 0,
             duration: 0.5,
             ease: "power2.in"
           });
-
-          console.log('🌑 Canvas fade animation scheduled');
         });
       },
       markers: false,
     }) : null;
 
-    // ScrollTrigger để điều khiển hiển thị text của từng section
-    const livingTextSection = document.querySelector('#sec-living');
-    const livingTextTrigger = livingTextSection ? ScrollTrigger.create({
-      trigger: livingTextSection,
-      start: "top center",
-      end: "bottom center",
-      onEnter: () => {
-        if (livingTextRef.current) {
-          gsap.to(livingTextRef.current, { opacity: 1, duration: 0.4 });
-        }
-      },
-      onLeave: () => {
-        if (livingTextRef.current) {
-          gsap.to(livingTextRef.current, { opacity: 0, duration: 0.3 });
-        }
-      },
-      onEnterBack: () => {
-        if (livingTextRef.current) {
-          gsap.to(livingTextRef.current, { opacity: 1, duration: 0.4 });
-        }
-      },
-      onLeaveBack: () => {
-        if (livingTextRef.current) {
-          gsap.to(livingTextRef.current, { opacity: 0, duration: 0.3 });
-        }
-      },
-      markers: false,
-    }) : null;
+    // ScrollTriggers cho từng text section
+    const sections: Array<{ id: string; section: TourSection }> = [
+      { id: '#sec-living', section: 'living' },
+      { id: '#sec-kitchen', section: 'kitchen' },
+      { id: '#sec-bath', section: 'bath' },
+      { id: '#sec-bed', section: 'bed' },
+    ];
 
-    const kitchenTextSection = document.querySelector('#sec-kitchen');
-    const kitchenTextTrigger = kitchenTextSection ? ScrollTrigger.create({
-      trigger: kitchenTextSection,
-      start: "top center",
-      end: "bottom center",
-      onEnter: () => {
-        if (kitchenTextRef.current) {
-          gsap.to(kitchenTextRef.current, { opacity: 1, duration: 0.4 });
-        }
-      },
-      onLeave: () => {
-        if (kitchenTextRef.current) {
-          gsap.to(kitchenTextRef.current, { opacity: 0, duration: 0.3 });
-        }
-      },
-      onEnterBack: () => {
-        if (kitchenTextRef.current) {
-          gsap.to(kitchenTextRef.current, { opacity: 1, duration: 0.4 });
-        }
-      },
-      onLeaveBack: () => {
-        if (kitchenTextRef.current) {
-          gsap.to(kitchenTextRef.current, { opacity: 0, duration: 0.3 });
-        }
-      },
-      markers: false,
-    }) : null;
+    const sectionTriggers = sections.map(({ id, section }) => {
+      const element = document.querySelector(id);
+      if (!element) return null;
 
-    const bathTextSection = document.querySelector('#sec-bath');
-    const bathTextTrigger = bathTextSection ? ScrollTrigger.create({
-      trigger: bathTextSection,
-      start: "top center",
-      end: "bottom center",
-      onEnter: () => {
-        if (bathTextRef.current) {
-          gsap.to(bathTextRef.current, { opacity: 1, duration: 0.4 });
-        }
-      },
-      onLeave: () => {
-        if (bathTextRef.current) {
-          gsap.to(bathTextRef.current, { opacity: 0, duration: 0.3 });
-        }
-      },
-      onEnterBack: () => {
-        if (bathTextRef.current) {
-          gsap.to(bathTextRef.current, { opacity: 1, duration: 0.4 });
-        }
-      },
-      onLeaveBack: () => {
-        if (bathTextRef.current) {
-          gsap.to(bathTextRef.current, { opacity: 0, duration: 0.3 });
-        }
-      },
-      markers: false,
-    }) : null;
-
-    const bedTextSection = document.querySelector('#sec-bed');
-    const bedTextTrigger = bedTextSection ? ScrollTrigger.create({
-      trigger: bedTextSection,
-      start: "top center",
-      end: "bottom center",
-      onEnter: () => {
-        if (bedTextRef.current) {
-          gsap.to(bedTextRef.current, { opacity: 1, duration: 0.4 });
-        }
-      },
-      onLeave: () => {
-        if (bedTextRef.current) {
-          gsap.to(bedTextRef.current, { opacity: 0, duration: 0.3 });
-        }
-      },
-      onEnterBack: () => {
-        if (bedTextRef.current) {
-          gsap.to(bedTextRef.current, { opacity: 1, duration: 0.4 });
-        }
-      },
-      onLeaveBack: () => {
-        if (bedTextRef.current) {
-          gsap.to(bedTextRef.current, { opacity: 0, duration: 0.3 });
-        }
-      },
-      markers: false,
-    }) : null;
+      return ScrollTrigger.create({
+        trigger: element,
+        start: "top center",
+        end: "bottom center",
+        onEnter: () => {
+          setCurrentSection(section);
+          showText(section);
+        },
+        onLeave: () => {
+          const currentState = useTourStore.getState();
+          if (currentState.currentSection === section) {
+            hideAllTexts();
+          }
+        },
+        onEnterBack: () => {
+          setCurrentSection(section);
+          showText(section);
+        },
+        onLeaveBack: () => {
+          const currentState = useTourStore.getState();
+          if (currentState.currentSection === section) {
+            hideAllTexts();
+          }
+        },
+        markers: false,
+      });
+    });
 
     // ScrollTrigger để ẩn canvas và circular exit khi qua section cuối
     const bedSection = document.querySelector('#sec-bed');
-    const ensureScrollEnabled = bedSection ? ScrollTrigger.create({
+    const exitTrigger = bedSection ? ScrollTrigger.create({
       trigger: bedSection,
       start: "bottom bottom",
       onLeave: () => {
-        // Đảm bảo scroll enabled khi rời section cuối
-        document.body.style.overflow = 'auto';
         console.log('✅ Passed last section, triggering circular exit');
 
-        // CIRCULAR EXIT ANIMATION
-        setShowCircleExit(true);
+        // Ẩn canvas và text
+        if (canvasWrapRef.current) {
+          canvasWrapRef.current.style.opacity = '0';
+        }
+        hideAllTexts();
+        setShowCanvas(false);
+        setCurrentSection('none');
+
+        // Trigger circular exit
+        setCircleAnimation('exit');
+        setIsTransitioning(true);
 
         requestAnimationFrame(() => {
           if (!circleExitRef.current) return;
 
           const circle = circleExitRef.current;
 
-          // ẨN CANVAS ngay lập tức
-          if (canvasWrapRef.current) {
-            canvasWrapRef.current.style.opacity = '0';
-          }
-
-          // Circular exit: Circle xuất hiện từ center → expand full screen
           gsap.timeline({
             onComplete: () => {
               console.log('🌑 Circular exit complete');
-              setShowCircleExit(false);
+              setCircleAnimation('none');
+              setIsTransitioning(false);
             }
           })
           .fromTo(circle,
@@ -370,26 +327,27 @@ export default function TourSection() {
         });
       },
       onEnterBack: () => {
-        // Hiện lại canvas khi scroll back vào tour với circular re-entry
         console.log('⬆️ Scrolling back into tour, triggering circular re-entry');
 
-        // CIRCULAR RE-ENTRY ANIMATION
-        setShowCircleReentry(true);
+        // Trigger circular re-entry
+        setCircleAnimation('reentry');
+        setIsTransitioning(true);
+        setShowCanvas(true);
 
         requestAnimationFrame(() => {
           if (!circleReentryRef.current) return;
 
           const circle = circleReentryRef.current;
 
-          // Circular re-entry: Circle xuất hiện full screen → shrink → disappear
           gsap.timeline({
             onComplete: () => {
               console.log('✨ Circular re-entry complete');
-              setShowCircleReentry(false);
+              setCircleAnimation('none');
+              setIsTransitioning(false);
             }
           })
           .fromTo(circle,
-            { scale: 50, opacity: 1 }, // Bắt đầu từ full screen
+            { scale: 50, opacity: 1 },
             { scale: 1, opacity: 1, duration: 0.8, ease: "power2.inOut" }
           )
           .to(circle, {
@@ -399,14 +357,12 @@ export default function TourSection() {
             ease: "power2.in"
           });
 
-          // Hiện canvas đồng thời
-          if (canvasWrapRef.current && isActivatedRef.current) {
+          // Hiện canvas
+          const currentState = useTourStore.getState();
+          if (canvasWrapRef.current && currentState.isActivated) {
             gsap.to(canvasWrapRef.current, {
               opacity: 1,
               duration: 0.8,
-              onComplete: () => {
-                console.log('🌟 Canvas shown back');
-              }
             });
           }
         });
@@ -418,15 +374,17 @@ export default function TourSection() {
       activateTrigger.kill();
       heroSnapTrigger.kill();
       hideTrigger?.kill();
-      livingTextTrigger?.kill();
-      kitchenTextTrigger?.kill();
-      bathTextTrigger?.kill();
-      bedTextTrigger?.kill();
-      ensureScrollEnabled?.kill();
+      sectionTriggers.forEach(trigger => trigger?.kill());
+      exitTrigger?.kill();
+
       // Force re-enable scroll khi unmount
       document.body.style.overflow = 'auto';
+
+      // Reset store
+      reset();
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Chỉ chạy 1 lần khi mount/unmount. Dependencies được đọc trực tiếp từ store trong callbacks
 
   return (
     <section
@@ -434,12 +392,11 @@ export default function TourSection() {
       ref={sectionRef}
       className="relative min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900"
     >
-      {/* Circular Reveal Overlay - When scrolling down */}
+      {/* Circular Reveal Overlay */}
       <div
         className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center"
-        style={{ display: showCircleReveal ? 'flex' : 'none' }}
+        style={{ display: circleAnimation === 'reveal' ? 'flex' : 'none' }}
       >
-        {/* Circle that expands */}
         <div
           ref={circleRef}
           className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-emerald-500 to-blue-600"
@@ -452,12 +409,11 @@ export default function TourSection() {
         />
       </div>
 
-      {/* Circular Collapse Overlay - When scrolling back to hero */}
+      {/* Circular Collapse Overlay */}
       <div
         className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center"
-        style={{ display: showCircleCollapse ? 'flex' : 'none' }}
+        style={{ display: circleAnimation === 'collapse' ? 'flex' : 'none' }}
       >
-        {/* Circle that collapses - Dùng gradient giống hero banner */}
         <div
           ref={circleCollapseRef}
           className="absolute w-32 h-32 rounded-full"
@@ -465,18 +421,17 @@ export default function TourSection() {
             background: 'linear-gradient(to bottom right, rgb(15 23 42), rgb(6 78 59), rgb(15 23 42))',
             boxShadow: '0 0 100px rgba(16, 185, 129, 0.3), 0 0 200px rgba(59, 130, 246, 0.2)',
             willChange: 'transform, opacity',
-            opacity: 1, // Bắt đầu với opacity 1
-            transform: 'scale(50)', // Bắt đầu từ full screen
+            opacity: 1,
+            transform: 'scale(50)',
           }}
         />
       </div>
 
-      {/* Circular Exit Overlay - When scrolling down to products */}
+      {/* Circular Exit Overlay */}
       <div
         className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center"
-        style={{ display: showCircleExit ? 'flex' : 'none' }}
+        style={{ display: circleAnimation === 'exit' ? 'flex' : 'none' }}
       >
-        {/* Circle that expands to products */}
         <div
           ref={circleExitRef}
           className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-blue-600 to-purple-600"
@@ -489,12 +444,11 @@ export default function TourSection() {
         />
       </div>
 
-      {/* Circular Re-entry Overlay - When scrolling back from products to tour */}
+      {/* Circular Re-entry Overlay */}
       <div
         className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center"
-        style={{ display: showCircleReentry ? 'flex' : 'none' }}
+        style={{ display: circleAnimation === 'reentry' ? 'flex' : 'none' }}
       >
-        {/* Circle that shrinks back into tour */}
         <div
           ref={circleReentryRef}
           className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-purple-600 to-blue-600"
@@ -502,35 +456,33 @@ export default function TourSection() {
             boxShadow: '0 0 100px rgba(147, 51, 234, 0.5), 0 0 200px rgba(59, 130, 246, 0.3)',
             willChange: 'transform, opacity',
             opacity: 1,
-            transform: 'scale(50)', // Bắt đầu từ full screen
+            transform: 'scale(50)',
           }}
         />
       </div>
 
-
-      {/* Canvas 3D fixed background - Hiển thị sau circular reveal */}
+      {/* Canvas 3D fixed background */}
       <div
         ref={canvasWrapRef}
         id="canvas-wrap"
-        className="fixed inset-0 z-10 pointer-events-none"
+        className="fixed inset-0 z-10"
+        style={{
+          pointerEvents: 'none',
+          opacity: 0,
+          display: showCanvas ? 'block' : 'none',
+        }}
       >
-        {/* Chỉ render ScrollStage khi đã activated */}
         {isActivated && <ScrollStage />}
-        {/* Layer gradient để chữ dễ đọc */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        <div style={{ pointerEvents: 'none' }} className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
       </div>
 
-      {/* Scrollable content - No overflow, window handles scroll */}
-      <div
-        id="scroll-root"
-        className="relative z-10"
-      >
+      {/* Scrollable content */}
+      <div id="scroll-root" className="relative z-10">
         {/* Section 0: Circular Reveal */}
         <section
           id="sec-reveal"
           className="relative min-h-screen grid place-items-center px-6"
         >
-          {/* Empty section - chỉ để trigger circular reveal */}
           {!isActivated && (
             <div className="max-w-3xl text-center">
               <motion.div
@@ -546,11 +498,12 @@ export default function TourSection() {
         </section>
 
         {/* Section 1: Phòng khách */}
-        <section
-          id="sec-living"
-          className="relative min-h-screen"
-        >
-          <div ref={livingTextRef} className="fixed inset-0 z-20 grid place-items-center px-6 pointer-events-none" style={{ opacity: 0 }}>
+        <section id="sec-living" className="relative min-h-screen">
+          <div
+            ref={livingTextRef}
+            className="fixed inset-0 z-20 grid place-items-center px-6 pointer-events-none"
+            style={{ opacity: 0 }}
+          >
             <div className="max-w-3xl text-center">
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
@@ -571,11 +524,12 @@ export default function TourSection() {
         </section>
 
         {/* Section 2: Nhà bếp */}
-        <section
-          id="sec-kitchen"
-          className="relative min-h-screen"
-        >
-          <div ref={kitchenTextRef} className="fixed inset-0 z-20 grid place-items-center px-6 pointer-events-none" style={{ opacity: 0 }}>
+        <section id="sec-kitchen" className="relative min-h-screen">
+          <div
+            ref={kitchenTextRef}
+            className="fixed inset-0 z-20 grid place-items-center px-6 pointer-events-none"
+            style={{ opacity: 0 }}
+          >
             <div className="max-w-xl text-center">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
@@ -600,11 +554,12 @@ export default function TourSection() {
         </section>
 
         {/* Section 3: Phòng tắm */}
-        <section
-          id="sec-bath"
-          className="relative min-h-screen"
-        >
-          <div ref={bathTextRef} className="fixed inset-0 z-20 grid place-items-center px-6 pointer-events-none" style={{ opacity: 0 }}>
+        <section id="sec-bath" className="relative min-h-screen">
+          <div
+            ref={bathTextRef}
+            className="fixed inset-0 z-20 grid place-items-center px-6 pointer-events-none"
+            style={{ opacity: 0 }}
+          >
             <div className="max-w-xl text-center">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
@@ -629,11 +584,12 @@ export default function TourSection() {
         </section>
 
         {/* Section 4: Phòng ngủ */}
-        <section
-          id="sec-bed"
-          className="relative min-h-screen"
-        >
-          <div ref={bedTextRef} className="fixed inset-0 z-20 grid place-items-center px-6 pointer-events-none" style={{ opacity: 0 }}>
+        <section id="sec-bed" className="relative min-h-screen">
+          <div
+            ref={bedTextRef}
+            className="fixed inset-0 z-20 grid place-items-center px-6 pointer-events-none"
+            style={{ opacity: 0 }}
+          >
             <div className="max-w-xl text-center">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
