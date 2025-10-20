@@ -10,12 +10,9 @@ export default function Header() {
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 50)
-
-            // Ẩn header khi scroll tới Our Products section
             const productsSection = document.querySelector('section.min-h-screen.py-20')
             if (productsSection) {
                 const rect = productsSection.getBoundingClientRect()
-                // Ẩn header khi products section vào viewport
                 setHideHeader(rect.top < 100 && rect.bottom > 0)
             }
         }
