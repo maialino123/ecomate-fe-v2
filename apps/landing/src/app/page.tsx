@@ -2,6 +2,8 @@
 import Header from "@/components/header";
 import HeroBanner from "@/components/hero-banner";
 import TourSection from "@/components/tour-section";
+import OurProducts from "@/components/our-products";
+import ConnectivityMap from "@/components/connectivity-map";
 
 export default function Page() {
   return (
@@ -17,6 +19,12 @@ export default function Page() {
 
       {/* 3D Tour Section - Kích hoạt sau khi scroll qua hero */}
       <TourSection />
+
+      {/* Our Products Section - With Glowing Effect */}
+      <OurProducts />
+
+      {/* Connectivity Map - Shipping Coverage */}
+      <ConnectivityMap />
     </div>
   );
 }
