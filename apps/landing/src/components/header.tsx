@@ -5,17 +5,23 @@ import Link from 'next/link'
 
 export default function Header() {
     const [scrolled, setScrolled] = useState(false)
-    const [hideHeader, setHideHeader] = useState(false)
+    const [showHeader, setShowHeader] = useState(false)
 
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 50)
-            const productsSection = document.querySelector('section.min-h-screen.py-20')
-            if (productsSection) {
-                const rect = productsSection.getBoundingClientRect()
-                setHideHeader(rect.top < 100 && rect.bottom > 0)
+
+            // Hiển thị header ở Hero và 3D Tour, ẩn khi ra khỏi 3D section
+            const tourSection = document.querySelector('#tour')
+            if (tourSection) {
+                const rect = tourSection.getBoundingClientRect()
+                // Ẩn header chỉ khi đã scroll QUA 3D tour section (bottom < 0)
+                const hasPassedTour = rect.bottom < 0
+                setShowHeader(!hasPassedTour)
             }
         }
+
+        handleScroll() // Check initial state
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
@@ -23,9 +29,9 @@ export default function Header() {
     return (
         <motion.header
             initial={{ y: -100 }}
-            animate={{ y: hideHeader ? -100 : 0 }}
+            animate={{ y: showHeader ? 0 : -100 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+            className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
                 scrolled ? 'bg-black/80 backdrop-blur-lg border-b border-white/10' : 'bg-transparent'
             }`}
         >
@@ -38,8 +44,8 @@ export default function Header() {
                     <span className="text-white font-semibold text-xl">Ecomate</span>
                 </Link>
 
-                {/* Navigation */}
-                <nav className="hidden md:flex items-center space-x-8">
+                {/* Desktop Navigation */}
+                <nav className="flex items-center space-x-8">
                     <a href="#hero" className="text-white/80 hover:text-white transition-colors">
                         Trang chủ
                     </a>
@@ -58,18 +64,6 @@ export default function Header() {
                         Mua ngay
                     </a>
                 </nav>
-
-                {/* Mobile menu button */}
-                <button className="md:hidden text-white">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M4 6h16M4 12h16M4 18h16"
-                        />
-                    </svg>
-                </button>
             </div>
         </motion.header>
     )
