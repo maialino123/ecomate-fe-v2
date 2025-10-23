@@ -3,12 +3,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuthStore } from '@workspace/lib/stores'
-import { LayoutDashboard, Users, UserCheck, Settings, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, Users, UserCheck, Settings, ChevronLeft, ChevronRight, Calculator } from 'lucide-react'
 import { useUIStore } from '@workspace/lib/stores'
 import { cn } from '@workspace/ui/lib/utils'
 
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['OWNER', 'ADMIN', 'STAFF', 'VIEWER'] },
+    { name: 'Cost Calculator', href: '/dashboard/cost-calculator', icon: Calculator, roles: ['OWNER', 'ADMIN', 'STAFF'] },
     { name: 'Users', href: '/dashboard/users', icon: Users, roles: ['OWNER'] },
     { name: 'Registration Requests', href: '/dashboard/registration-requests', icon: UserCheck, roles: ['OWNER'] },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings, roles: ['OWNER', 'ADMIN'] },
