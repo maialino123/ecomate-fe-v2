@@ -10,6 +10,9 @@ import {
     MessageResponse,
     VerifyMagicLinkResponse,
     VerifyMagicLinkDto,
+    ApproveFromEmailDto,
+    RejectFromEmailDto,
+    ApprovalResponse,
 } from './auth.types'
 
 export class AuthApi {
@@ -62,6 +65,30 @@ export class AuthApi {
      */
     async me(): Promise<MeResponse> {
         const response = await this.client.get<MeResponse>('/v1/auth/me')
+        return response.data
+    }
+
+    /**
+     * Approve registration from email link
+     */
+    async approveFromEmail(dto: ApproveFromEmailDto): Promise<ApprovalResponse> {
+        const params = new URLSearchParams({ token: dto.token })
+        if (dto.role) {
+            params.append('role', dto.role)
+        }
+        const response = await this.client.get<ApprovalResponse>(`/v1/auth/approval/accept?${params.toString()}`)
+        return response.data
+    }
+
+    /**
+     * Reject registration from email link
+     */
+    async rejectFromEmail(dto: RejectFromEmailDto): Promise<ApprovalResponse> {
+        const params = new URLSearchParams({ token: dto.token })
+        if (dto.reason) {
+            params.append('reason', dto.reason)
+        }
+        const response = await this.client.get<ApprovalResponse>(`/v1/auth/approval/reject?${params.toString()}`)
         return response.data
     }
 }

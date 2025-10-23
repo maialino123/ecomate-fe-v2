@@ -20,9 +20,17 @@ export function getApiClient(): Api {
                 authStore.setTokens(tokens)
             },
             onUnauthorized: () => {
+                // Only logout and redirect if we're actually unauthenticated
+                // This is called when refresh token fails, meaning session is truly expired
+                console.warn('[API Client] Refresh token failed - logging out user')
+
                 authStore.logout()
+
                 if (typeof window !== 'undefined') {
-                    window.location.href = '/login'
+                    // Only redirect if not already on login page
+                    if (!window.location.pathname.includes('/login')) {
+                        window.location.href = '/login'
+                    }
                 }
             },
         })
