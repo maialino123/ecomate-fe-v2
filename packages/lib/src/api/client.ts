@@ -89,18 +89,26 @@ export function createApiClient(config: ApiClientConfig): AxiosInstance {
             originalRequest._retry = true
             isRefreshing = true
 
-            try {
-                const refreshToken = config.getRefreshToken?.()
-                if (!refreshToken) {
-                    throw new Error('No refresh token available')
-                }
+            // Check if refresh token exists before attempting refresh
+            const refreshToken = config.getRefreshToken?.()
+            if (!refreshToken) {
+                console.warn('[API Client] No refresh token available - user needs to login')
+                processQueue(new Error('No refresh token'))
+                isRefreshing = false
+                config.onUnauthorized?.()
+                return Promise.reject(new Error('No refresh token available'))
+            }
 
+            try {
                 // Call refresh endpoint
+                console.log('[API Client] Calling refresh endpoint...')
                 const response = await axios.post(`${config.baseURL}/v1/auth/refresh`, {
                     refreshToken,
                 })
 
                 const { accessToken, refreshToken: newRefreshToken } = response.data
+
+                console.log('[API Client] Token refresh successful')
 
                 // Update tokens
                 config.onTokenRefresh?.({ accessToken, refreshToken: newRefreshToken })
@@ -128,10 +136,11 @@ export function createApiClient(config: ApiClientConfig): AxiosInstance {
                         config.onUnauthorized?.()
                     } else {
                         console.error('[API Client] Refresh failed with non-auth error:', status || 'network error')
+                        // Don't logout - just let the error propagate
                     }
-                } else if (!refreshToken) {
-                    // No refresh token available - user needs to login
-                    config.onUnauthorized?.()
+                } else {
+                    // Non-Axios error (shouldn't happen, but handle it)
+                    console.error('[API Client] Refresh failed with unexpected error:', refreshError)
                 }
 
                 return Promise.reject(refreshError)
