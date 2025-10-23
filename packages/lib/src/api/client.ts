@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosError } from 'axios'
 
 export interface ApiClientConfig {
     baseURL: string
@@ -52,6 +52,13 @@ export function createApiClient(config: ApiClientConfig): AxiosInstance {
         async error => {
             const originalRequest = error.config
 
+            // Log all API errors for debugging
+            console.debug('[API Client] Error:', {
+                url: originalRequest?.url,
+                status: error.response?.status,
+                message: error.message,
+            })
+
             // Don't intercept 401 from auth endpoints (login, register, etc.)
             const isAuthEndpoint =
                 originalRequest.url?.includes('/auth/signin') ||
@@ -63,6 +70,8 @@ export function createApiClient(config: ApiClientConfig): AxiosInstance {
             if (error.response?.status !== 401 || originalRequest._retry || isAuthEndpoint) {
                 return Promise.reject(error)
             }
+
+            console.log('[API Client] 401 detected on', originalRequest.url, '- attempting token refresh')
 
             // If already refreshing, queue the request
             if (isRefreshing) {
@@ -108,8 +117,22 @@ export function createApiClient(config: ApiClientConfig): AxiosInstance {
                 processQueue(refreshError as Error)
                 isRefreshing = false
 
-                // Token refresh failed, logout user
-                config.onUnauthorized?.()
+                // Only call onUnauthorized if refresh actually failed due to invalid/expired token
+                // Don't call it for network errors or other issues
+                if (refreshError instanceof AxiosError) {
+                    const status = refreshError.response?.status
+                    // Only logout on 401 (unauthorized) or 403 (forbidden) from refresh endpoint
+                    // Network errors or 5xx errors should not trigger logout
+                    if (status === 401 || status === 403) {
+                        console.warn('[API Client] Refresh token invalid or expired (status:', status, ')')
+                        config.onUnauthorized?.()
+                    } else {
+                        console.error('[API Client] Refresh failed with non-auth error:', status || 'network error')
+                    }
+                } else if (!refreshToken) {
+                    // No refresh token available - user needs to login
+                    config.onUnauthorized?.()
+                }
 
                 return Promise.reject(refreshError)
             }

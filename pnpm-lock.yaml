@@ -33,7 +33,7 @@ importers:
   apps/admin:
     dependencies:
       '@hookform/resolvers':
-        specifier: ^5.2.1
+        specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.65.0(react@19.2.0))
       '@tanstack/react-query':
         specifier: ^5.87.1

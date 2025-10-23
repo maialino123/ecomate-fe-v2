@@ -17,7 +17,7 @@ export interface User {
     updatedAt: string
 }
 
-interface AuthTokens {
+export interface AuthTokens {
     accessToken: string
     refreshToken: string
 }
