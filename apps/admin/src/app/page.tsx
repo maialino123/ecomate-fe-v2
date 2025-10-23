@@ -1,21 +1,27 @@
 'use client'
 
-import { Button } from '@workspace/ui/components/Button'
-import { ThemeSwitcher } from '@workspace/shared/components/ThemeSwitcher'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuthStore } from '@workspace/lib/stores'
+import { Loader2 } from 'lucide-react'
 
 export default function Page() {
+    const router = useRouter()
+    const { isAuthenticated } = useAuthStore()
+
+    useEffect(() => {
+        // Redirect based on auth status
+        if (isAuthenticated) {
+            router.push('/dashboard')
+        } else {
+            router.push('/login')
+        }
+    }, [isAuthenticated, router])
+
+    // Show loading while redirecting
     return (
         <div className="flex items-center justify-center min-h-screen">
-            <div className="text-center max-w-2xl mx-auto px-4">
-                <ThemeSwitcher />
-                <h1 className="text-4xl md:text-5xl font-bold my-6">Admin Dashboard</h1>
-                <p className="text-lg text-muted-foreground">
-                    Welcome to Ecomate Admin Dashboard. Manage your application from here.
-                </p>
-                <Button size="lg" className="mt-6">
-                    Get Started
-                </Button>
-            </div>
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
         </div>
     )
 }
