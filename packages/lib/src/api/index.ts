@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios'
 import { ExampleApi } from './sdk/example.api'
 import { AuthApi } from './sdk/auth.api'
 import { AdminApi } from './sdk/admin.api'
+import { CostApi } from './sdk/cost.api'
 
 /**
  * API class for the application
@@ -18,11 +19,13 @@ export class Api {
     example: ExampleApi
     auth: AuthApi
     admin: AdminApi
+    cost: CostApi
 
     constructor(private readonly client: AxiosInstance) {
         this.example = new ExampleApi(this.client)
         this.auth = new AuthApi(this.client)
         this.admin = new AdminApi(this.client)
+        this.cost = new CostApi(this.client)
     }
 }
 
@@ -30,5 +33,6 @@ export class Api {
 export * from './sdk/auth.types'
 export * from './sdk/admin.types'
 export * from './sdk/example.type'
+export * from './sdk/cost.types'
 export * from './client'
 export * from './interceptors'

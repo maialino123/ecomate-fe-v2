@@ -7,10 +7,11 @@ import { UserRole, UserStatus } from '@workspace/lib/stores'
 import { formatDateTime, formatRole, formatStatus } from '@workspace/shared/utils'
 import { Loader2, Edit, Trash2 } from 'lucide-react'
 import { Button } from '@workspace/ui/components/Button'
+import { ProtectedRoute } from '../../../../lib/protected-route'
 
 type DialogType = 'role' | 'status' | 'delete' | null
 
-export default function UsersPage() {
+function UsersPageContent() {
     const api = useApi()
     const { data, isLoading, error, refetch } = useUsers({ api })
     const [selectedUser, setSelectedUser] = useState<any>(null)
@@ -329,5 +330,14 @@ function StatusBadge({ status }: { status: string }) {
         >
             {formatStatus(status)}
         </span>
+    )
+}
+
+// Wrap with ProtectedRoute to ensure only OWNER can access
+export default function UsersPage() {
+    return (
+        <ProtectedRoute requiredRoles={['OWNER']}>
+            <UsersPageContent />
+        </ProtectedRoute>
     )
 }

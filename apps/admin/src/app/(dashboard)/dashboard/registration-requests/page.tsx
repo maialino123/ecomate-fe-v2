@@ -7,8 +7,9 @@ import { UserRole } from '@workspace/lib/stores'
 import { formatDateTime, formatStatus } from '@workspace/shared/utils'
 import { Loader2, CheckCircle, XCircle } from 'lucide-react'
 import { Button } from '@workspace/ui/components/Button'
+import { ProtectedRoute } from '../../../../lib/protected-route'
 
-export default function RegistrationRequestsPage() {
+function RegistrationRequestsPageContent() {
     const api = useApi()
     const { data, isLoading, error, refetch } = useRegistrationRequests({ api })
     const [selectedRequest, setSelectedRequest] = useState<string | null>(null)
@@ -243,5 +244,14 @@ function StatusBadge({ status }: { status: string }) {
         >
             {formatStatus(status)}
         </span>
+    )
+}
+
+// Wrap with ProtectedRoute to ensure only OWNER can access
+export default function RegistrationRequestsPage() {
+    return (
+        <ProtectedRoute requiredRoles={['OWNER']}>
+            <RegistrationRequestsPageContent />
+        </ProtectedRoute>
     )
 }

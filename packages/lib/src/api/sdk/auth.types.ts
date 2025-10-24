@@ -23,6 +23,16 @@ export interface VerifyMagicLinkDto {
     token: string
 }
 
+export interface ApproveFromEmailDto {
+    token: string
+    role?: 'ADMIN' | 'STAFF' | 'VIEWER'
+}
+
+export interface RejectFromEmailDto {
+    token: string
+    reason?: string
+}
+
 // ============= Response DTOs =============
 
 export interface AuthTokensResponse {
@@ -56,4 +66,10 @@ export interface VerifyMagicLinkResponse {
     accessToken: string
     refreshToken: string
     user: User
+}
+
+export interface ApprovalResponse {
+    message: string
+    userEmail: string
+    status: 'APPROVED' | 'REJECTED'
 }
