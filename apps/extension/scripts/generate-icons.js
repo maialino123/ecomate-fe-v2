@@ -1,0 +1,35 @@
+// Simple script to generate placeholder PNG icons
+// Run with: node scripts/generate-icons.js
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const sizes = [16, 48, 128];
+const iconDir = path.join(__dirname, '..', 'public', 'icons');
+
+// Create a simple purple square PNG (1x1 pixel, will be scaled)
+// This is a minimal valid PNG file
+const purplePNG = Buffer.from([
+  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // PNG signature
+  0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, // IHDR chunk
+  0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, // 1x1 dimensions
+  0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53,
+  0xDE, 0x00, 0x00, 0x00, 0x0C, 0x49, 0x44, 0x41, // IDAT chunk (purple pixel)
+  0x54, 0x08, 0xD7, 0x63, 0x60, 0x00, 0x02, 0x00,
+  0x00, 0x05, 0x00, 0x01, 0xE2, 0x26, 0x05, 0x9B,
+  0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, // IEND chunk
+  0xAE, 0x42, 0x60, 0x82
+]);
+
+sizes.forEach(size => {
+  const filename = path.join(iconDir, `icon-${size}.png`);
+  fs.writeFileSync(filename, purplePNG);
+  console.log(`Created placeholder: icon-${size}.png`);
+});
+
+console.log('\n✅ Placeholder icons generated!');
+console.log('Note: Replace with proper icons before production.');
