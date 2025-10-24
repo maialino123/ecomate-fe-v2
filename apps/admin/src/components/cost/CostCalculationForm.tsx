@@ -72,9 +72,19 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
             const baseCost = totalVNDCost / quantity
 
             // Step 5: Effective cost with return rate (C_eff)
+            // Guard: returnRate cannot be 100% (would cause division by zero)
+            if (returnRate >= 1) {
+                console.error('Return rate cannot be 100% or higher')
+                return null
+            }
             const effectiveCost = baseCost / (1 - returnRate)
 
             // Step 6: Suggested selling price (P)
+            // Guard: platformFeeRate cannot be 100% (would cause division by zero)
+            if (platformFeeRate >= 1) {
+                console.error('Platform fee rate cannot be 100% or higher')
+                return null
+            }
             const suggestedSellingPrice = (effectiveCost * (1 + profitMarginRate)) / (1 - platformFeeRate)
 
             // Step 7: Net profit per unit (L)
@@ -280,12 +290,12 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    max="1"
+                                    max="0.99"
                                     className="block w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                     placeholder="0.05"
                                     {...register('returnRate', {
                                         min: { value: 0, message: 'Phải >= 0' },
-                                        max: { value: 1, message: 'Phải <= 1' },
+                                        max: { value: 0.99, message: 'Phải < 100% (tối đa 99%)' },
                                         valueAsNumber: true,
                                     })}
                                 />
@@ -304,12 +314,12 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    max="1"
+                                    max="0.99"
                                     className="block w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                     placeholder="0.20"
                                     {...register('platformFeeRate', {
                                         min: { value: 0, message: 'Phải >= 0' },
-                                        max: { value: 1, message: 'Phải <= 1' },
+                                        max: { value: 0.99, message: 'Phải < 100% (tối đa 99%)' },
                                         valueAsNumber: true,
                                     })}
                                 />
