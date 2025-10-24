@@ -1,0 +1,43 @@
+{
+  "name": "extension",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:prod": "vite build --mode production",
+    "typecheck": "tsc --noEmit",
+    "package": "node scripts/package-extension.js",
+    "build:release": "pnpm typecheck && pnpm build:prod && pnpm package",
+    "clean": "rm -rf dist releases"
+  },
+  "dependencies": {
+    "@heroui/react": "^2.8.5",
+    "@heroui/tabs": "^2.2.24",
+    "@workspace/config": "workspace:*",
+    "@workspace/lib": "workspace:*",
+    "@workspace/ui": "workspace:*",
+    "framer-motion": "^12.23.24",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "sonner": "^2.0.7",
+    "zod": "^3.25.76",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.25",
+    "@types/chrome": "^0.0.268",
+    "@types/node": "^20.19.9",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "3",
+    "typescript": "^5.9.2",
+    "vite": "^6.0.1"
+  }
+}
