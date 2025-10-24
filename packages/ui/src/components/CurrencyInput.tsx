@@ -13,31 +13,73 @@ const currencyConfig = {
         symbol: '¥',
         name: 'Chinese Yuan',
         locale: 'zh-CN',
-        bgColor: 'bg-yellow-50',
-        borderColor: 'border-yellow-300',
-        focusColor: 'focus:border-yellow-500 focus:ring-yellow-500',
+        bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
+        borderColor: 'border-yellow-300 dark:border-yellow-700',
+        focusColor: 'focus:border-yellow-500 focus:ring-yellow-500 dark:focus:border-yellow-400 dark:focus:ring-yellow-400',
     },
     VND: {
         symbol: '₫',
         name: 'Vietnamese Dong',
         locale: 'vi-VN',
-        bgColor: 'bg-blue-50',
-        borderColor: 'border-blue-300',
-        focusColor: 'focus:border-blue-500 focus:ring-blue-500',
+        bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+        borderColor: 'border-blue-300 dark:border-blue-700',
+        focusColor: 'focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400',
     },
     USD: {
         symbol: '$',
         name: 'US Dollar',
         locale: 'en-US',
-        bgColor: 'bg-green-50',
-        borderColor: 'border-green-300',
-        focusColor: 'focus:border-green-500 focus:ring-green-500',
+        bgColor: 'bg-green-50 dark:bg-green-900/20',
+        borderColor: 'border-green-300 dark:border-green-700',
+        focusColor: 'focus:border-green-500 focus:ring-green-500 dark:focus:border-green-400 dark:focus:ring-green-400',
     },
 }
 
 export const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
-    ({ currency, error, label, helperText, className, ...props }, ref) => {
+    ({ currency, error, label, helperText, className, value, onChange, ...props }, ref) => {
         const config = currencyConfig[currency]
+        const [displayValue, setDisplayValue] = React.useState('')
+
+        // Format number with thousand separators
+        const formatNumber = (num: string | number): string => {
+            if (num === '' || num === undefined || num === null) return ''
+            const numStr = String(num).replace(/,/g, '')
+            if (numStr === '' || isNaN(Number(numStr))) return numStr
+            return Number(numStr).toLocaleString('en-US')
+        }
+
+        // Remove formatting and get raw number
+        const unformatNumber = (formatted: string): string => {
+            return formatted.replace(/,/g, '')
+        }
+
+        // Update display value when value prop changes
+        React.useEffect(() => {
+            if (value !== undefined && value !== null && typeof value !== 'object') {
+                setDisplayValue(formatNumber(value))
+            }
+        }, [value])
+
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const inputValue = e.target.value
+            const rawValue = unformatNumber(inputValue)
+
+            // Allow empty, numbers, and single decimal point
+            if (rawValue === '' || /^\d*\.?\d*$/.test(rawValue)) {
+                setDisplayValue(inputValue.includes('.') ? inputValue : formatNumber(rawValue))
+
+                // Create synthetic event with raw number value
+                const syntheticEvent = {
+                    ...e,
+                    target: {
+                        ...e.target,
+                        value: rawValue,
+                    },
+                } as React.ChangeEvent<HTMLInputElement>
+
+                onChange?.(syntheticEvent)
+            }
+        }
 
         return (
             <div className="space-y-1">
@@ -53,17 +95,21 @@ export const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputPro
                     </div>
                     <input
                         ref={ref}
-                        type="number"
-                        step="any"
+                        type="text"
+                        inputMode="decimal"
+                        value={displayValue}
+                        onChange={handleChange}
                         className={cn(
                             'block w-full pl-10 pr-12 py-2 border rounded-md shadow-sm',
                             'text-gray-900 dark:text-white',
-                            'placeholder:text-gray-400',
+                            'placeholder:text-gray-400 dark:placeholder:text-gray-500',
                             'focus:outline-none focus:ring-2',
                             config.bgColor,
-                            error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : config.borderColor,
+                            error
+                                ? 'border-red-500 focus:border-red-500 focus:ring-red-500 dark:border-red-600 dark:focus:border-red-500 dark:focus:ring-red-500'
+                                : config.borderColor,
                             error ? '' : config.focusColor,
-                            'disabled:bg-gray-100 disabled:cursor-not-allowed',
+                            'disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed',
                             className,
                         )}
                         {...props}
