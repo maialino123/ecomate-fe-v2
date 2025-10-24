@@ -22,6 +22,14 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "dev:extension": {
+      "cache": false,
+      "persistent": true
+    },
+    "build:extension": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
     }
   }
 }
