@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { Calculator } from 'lucide-react'
 import { CurrencyInput } from '@workspace/ui/components/CurrencyInput'
 import { CalculatePriceDto, PriceCalculationResult } from '@workspace/lib'
 import { useDebounce } from '../hooks/useDebounce'
+import { FormattedNumberInput } from './FormattedNumberInput'
 
 interface CostCalculationFormProps {
     onCalculationResult: (result: PriceCalculationResult | null) => void
@@ -29,6 +30,7 @@ const DEFAULT_VALUES: CostFormData = {
 export function CostCalculationForm({ onCalculationResult, onCalculationLoading }: CostCalculationFormProps) {
     const {
         register,
+        control,
         watch,
         formState: { errors },
     } = useForm<CostFormData>({
@@ -235,40 +237,50 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Tỷ giá CNY → VND <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="number"
-                                step="any"
-                                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                placeholder="3600"
-                                {...register('exchangeRateCNY', {
+                            <Controller
+                                name="exchangeRateCNY"
+                                control={control}
+                                rules={{
                                     required: 'Tỷ giá là bắt buộc',
                                     min: { value: 0, message: 'Tỷ giá phải > 0' },
-                                    valueAsNumber: true,
-                                })}
+                                }}
+                                render={({ field }) => (
+                                    <FormattedNumberInput
+                                        {...field}
+                                        onChange={(value) => field.onChange(value === '' ? 0 : Number(value))}
+                                        className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                        placeholder="3,600"
+                                    />
+                                )}
                             />
                             {errors.exchangeRateCNY && (
-                                <p className="text-xs text-red-600">{errors.exchangeRateCNY.message}</p>
+                                <p className="text-xs text-red-600 dark:text-red-400">{errors.exchangeRateCNY.message}</p>
                             )}
-                            <p className="text-xs text-gray-500">1 CNY = ? VND</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">1 CNY = ? VND</p>
                         </div>
 
                         <div className="space-y-1">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Số lượng sản phẩm <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="number"
-                                step="1"
-                                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                placeholder="50"
-                                {...register('quantity', {
+                            <Controller
+                                name="quantity"
+                                control={control}
+                                rules={{
                                     required: 'Số lượng là bắt buộc',
                                     min: { value: 1, message: 'Số lượng phải >= 1' },
-                                    valueAsNumber: true,
-                                })}
+                                }}
+                                render={({ field }) => (
+                                    <FormattedNumberInput
+                                        {...field}
+                                        onChange={(value) => field.onChange(value === '' ? 1 : Number(value))}
+                                        className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                        placeholder="50"
+                                    />
+                                )}
                             />
-                            {errors.quantity && <p className="text-xs text-red-600">{errors.quantity.message}</p>}
-                            <p className="text-xs text-gray-500">Số sản phẩm trong lô hàng</p>
+                            {errors.quantity && <p className="text-xs text-red-600 dark:text-red-400">{errors.quantity.message}</p>}
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Số sản phẩm trong lô hàng</p>
                         </div>
                     </div>
                 </div>
@@ -291,7 +303,7 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                                     step="0.01"
                                     min="0"
                                     max="0.99"
-                                    className="block w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="block w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-green-500 dark:focus:border-green-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                     placeholder="0.05"
                                     {...register('returnRate', {
                                         min: { value: 0, message: 'Phải >= 0' },
@@ -299,10 +311,10 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                                         valueAsNumber: true,
                                     })}
                                 />
-                                <span className="absolute right-3 top-2.5 text-gray-500 text-sm">%</span>
+                                <span className="absolute right-3 top-2.5 text-gray-500 dark:text-gray-400 text-sm">%</span>
                             </div>
-                            {errors.returnRate && <p className="text-xs text-red-600">{errors.returnRate.message}</p>}
-                            <p className="text-xs text-gray-500">0.05 = 5%</p>
+                            {errors.returnRate && <p className="text-xs text-red-600 dark:text-red-400">{errors.returnRate.message}</p>}
+                            <p className="text-xs text-gray-500 dark:text-gray-400">0.05 = 5%</p>
                         </div>
 
                         <div className="space-y-1">
@@ -315,7 +327,7 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                                     step="0.01"
                                     min="0"
                                     max="0.99"
-                                    className="block w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="block w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-green-500 dark:focus:border-green-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                     placeholder="0.20"
                                     {...register('platformFeeRate', {
                                         min: { value: 0, message: 'Phải >= 0' },
@@ -323,12 +335,12 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                                         valueAsNumber: true,
                                     })}
                                 />
-                                <span className="absolute right-3 top-2.5 text-gray-500 text-sm">%</span>
+                                <span className="absolute right-3 top-2.5 text-gray-500 dark:text-gray-400 text-sm">%</span>
                             </div>
                             {errors.platformFeeRate && (
-                                <p className="text-xs text-red-600">{errors.platformFeeRate.message}</p>
+                                <p className="text-xs text-red-600 dark:text-red-400">{errors.platformFeeRate.message}</p>
                             )}
-                            <p className="text-xs text-gray-500">0.20 = 20%</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">0.20 = 20%</p>
                         </div>
 
                         <div className="space-y-1">
@@ -341,19 +353,19 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                                     step="0.01"
                                     min="0"
                                     max="1"
-                                    className="block w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="block w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-green-500 dark:focus:border-green-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                     placeholder="0.15"
                                     {...register('profitMarginRate', {
                                         min: { value: 0, message: 'Phải >= 0' },
                                         valueAsNumber: true,
                                     })}
                                 />
-                                <span className="absolute right-3 top-2.5 text-gray-500 text-sm">%</span>
+                                <span className="absolute right-3 top-2.5 text-gray-500 dark:text-gray-400 text-sm">%</span>
                             </div>
                             {errors.profitMarginRate && (
-                                <p className="text-xs text-red-600">{errors.profitMarginRate.message}</p>
+                                <p className="text-xs text-red-600 dark:text-red-400">{errors.profitMarginRate.message}</p>
                             )}
-                            <p className="text-xs text-gray-500">0.15 = 15%</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">0.15 = 15%</p>
                         </div>
                     </div>
                 </div>
