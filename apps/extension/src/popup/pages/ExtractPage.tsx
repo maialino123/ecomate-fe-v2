@@ -6,22 +6,25 @@
 import { useExtractStore } from '../store/extract';
 import { PreviewPanel } from '../components/PreviewPanel';
 import { DownloadButton } from '../components/DownloadButton';
+import { SubmitButton } from '../components/SubmitButton';
 import { InlineStats } from '../components/InlineStats';
 import { ExtractButton } from '../components/ExtractButton';
 import { Alert, AlertDescription } from '../components/ui/alert';
+import { useProductsStore } from '../store/products';
 
 export function ExtractPage() {
   const { data, loading, error } = useExtractStore();
+  const { fetchCount } = useProductsStore();
 
   return (
-    <div className="w-[600px] h-[500px] bg-background flex flex-col">
+    <div className="w-[700px] h-[600px] bg-background flex flex-col">
       {/* Header */}
-      <div className="px-3 py-2 border-b border-border flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-border flex items-center justify-between">
         <div>
-          <h1 className="text-sm font-bold text-foreground">
+          <h1 className="text-base font-bold text-foreground">
             1688 Product Extractor
           </h1>
-          <p className="text-[10px] text-muted-foreground mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Extract product data from current page
           </p>
         </div>
@@ -30,7 +33,7 @@ export function ExtractPage() {
 
       {/* Error State */}
       {error && (
-        <div className="mx-3 mt-2">
+        <div className="mx-4 mt-3">
           <Alert variant="error">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -50,13 +53,22 @@ export function ExtractPage() {
           />
 
           {/* Preview Panel - Takes remaining space */}
-          <div className="flex-1 overflow-hidden px-3 py-2">
+          <div className="flex-1 overflow-hidden px-4 py-3">
             <PreviewPanel data={data} />
           </div>
 
-          {/* Sticky Download Button */}
-          <div className="sticky bottom-0 bg-background border-t px-3 py-2">
-            <DownloadButton data={data} />
+          {/* Sticky Action Buttons */}
+          <div className="sticky bottom-0 bg-background border-t px-4 py-3">
+            <div className="flex flex-col gap-3">
+              <SubmitButton
+                data={data}
+                onSuccess={() => {
+                  // Refresh product count after successful submit
+                  fetchCount();
+                }}
+              />
+              <DownloadButton data={data} />
+            </div>
           </div>
         </>
       )}
