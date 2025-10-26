@@ -131,7 +131,7 @@ export function SubmitButton({ data, onSuccess }: Props) {
     <>
       <Button
         color="primary"
-        size="sm"
+        size="md"
         onPress={() => handleSubmit(false)}
         isLoading={loading}
         fullWidth
@@ -139,8 +139,8 @@ export function SubmitButton({ data, onSuccess }: Props) {
           !loading && (
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"

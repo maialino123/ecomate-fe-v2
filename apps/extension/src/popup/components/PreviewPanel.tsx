@@ -16,19 +16,19 @@ interface Props {
 export function PreviewPanel({ data }: Props) {
   return (
     <Card className="h-full overflow-hidden shadow-sm">
-      <CardHeader className="pb-1 pt-2 px-3">
-        <h3 className="text-xs font-semibold leading-tight line-clamp-2">{data.title}</h3>
+      <CardHeader className="pb-2 pt-3 px-4">
+        <h3 className="text-sm font-semibold leading-tight line-clamp-2">{data.title}</h3>
       </CardHeader>
 
       <CardBody className="px-0 py-0 overflow-hidden">
         <Tabs
           aria-label="Product data tabs"
           variant="underlined"
-          size="sm"
+          size="md"
           color="primary"
           classNames={{
-            tabList: 'px-3',
-            panel: 'h-[360px] overflow-auto px-3 pb-3 pt-2',
+            tabList: 'px-4',
+            panel: 'h-[440px] overflow-auto px-4 pb-3 pt-2',
           }}
         >
           {/* Overview Tab */}
@@ -36,32 +36,32 @@ export function PreviewPanel({ data }: Props) {
             <div className="space-y-3">
               {/* Pricing Section */}
               <div>
-                <h4 className="text-[10px] font-semibold text-default-500 uppercase tracking-wide mb-1.5">
+                <h4 className="text-xs font-semibold text-default-500 uppercase tracking-wide mb-2">
                   Pricing
                 </h4>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {data.priceTiers.map((tier, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-2 bg-content2 rounded-lg hover:bg-content3 transition-colors"
+                      className="flex items-center justify-between p-2.5 bg-content2 rounded-lg hover:bg-content3 transition-colors"
                     >
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-medium">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">
                           {tier.minQty}
                           {tier.maxQty ? `–${tier.maxQty}` : '+'} units
                         </span>
                         {index === 0 && (
-                          <Chip size="sm" color="success" variant="flat" className="h-4 text-[10px]">
+                          <Chip size="sm" color="success" variant="flat" className="h-5 text-xs">
                             Base
                           </Chip>
                         )}
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-bold text-primary">
+                        <div className="text-base font-bold text-primary">
                           ¥{tier.price.toFixed(2)}
                         </div>
                         {index > 0 && data.priceTiers[0] && (
-                          <div className="text-[10px] text-default-500">
+                          <div className="text-xs text-default-500">
                             {(
                               ((data.priceTiers[0].price - tier.price) /
                                 data.priceTiers[0].price) *
@@ -79,15 +79,15 @@ export function PreviewPanel({ data }: Props) {
               {/* Supplier Info */}
               {data.supplierName && (
                 <div>
-                  <h4 className="text-[10px] font-semibold text-default-500 uppercase tracking-wide mb-1.5">
+                  <h4 className="text-xs font-semibold text-default-500 uppercase tracking-wide mb-2">
                     Supplier
                   </h4>
-                  <div className="p-2 bg-content2 rounded-lg">
-                    <p className="text-xs font-medium">
+                  <div className="p-2.5 bg-content2 rounded-lg">
+                    <p className="text-sm font-medium">
                       {data.supplierName}
                     </p>
                     {data.supplierId && (
-                      <p className="text-[10px] text-default-500 font-mono mt-0.5">
+                      <p className="text-xs text-default-500 font-mono mt-1">
                         ID: {data.supplierId}
                       </p>
                     )}
@@ -98,11 +98,11 @@ export function PreviewPanel({ data }: Props) {
               {/* Weight */}
               {data.weight && (
                 <div>
-                  <h4 className="text-[10px] font-semibold text-default-500 uppercase tracking-wide mb-1.5">
+                  <h4 className="text-xs font-semibold text-default-500 uppercase tracking-wide mb-2">
                     Weight
                   </h4>
-                  <div className="p-2 bg-content2 rounded-lg">
-                    <p className="text-xs font-medium">
+                  <div className="p-2.5 bg-content2 rounded-lg">
+                    <p className="text-sm font-medium">
                       {data.weight} kg
                     </p>
                   </div>
@@ -111,15 +111,15 @@ export function PreviewPanel({ data }: Props) {
 
               {/* Source URL */}
               <div>
-                <h4 className="text-[10px] font-semibold text-default-500 uppercase tracking-wide mb-1.5">
+                <h4 className="text-xs font-semibold text-default-500 uppercase tracking-wide mb-2">
                   Source
                 </h4>
-                <div className="p-2 bg-content2 rounded-lg">
+                <div className="p-2.5 bg-content2 rounded-lg">
                   <a
                     href={data.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-primary hover:underline break-all"
+                    className="text-sm text-primary hover:underline break-all"
                   >
                     {data.sourceUrl}
                   </a>
@@ -128,11 +128,11 @@ export function PreviewPanel({ data }: Props) {
 
               {/* Extracted At */}
               <div>
-                <h4 className="text-[10px] font-semibold text-default-500 uppercase tracking-wide mb-1.5">
+                <h4 className="text-xs font-semibold text-default-500 uppercase tracking-wide mb-2">
                   Extracted
                 </h4>
-                <div className="p-2 bg-content2 rounded-lg">
-                  <p className="text-xs">
+                <div className="p-2.5 bg-content2 rounded-lg">
+                  <p className="text-sm">
                     {new Date(data.extractedAt).toLocaleString('en-US', {
                       dateStyle: 'medium',
                       timeStyle: 'short',
@@ -159,27 +159,27 @@ export function PreviewPanel({ data }: Props) {
               <div className="grid grid-cols-2 gap-2">
                 {data.skus.map((sku, index) => (
                   <Card key={index} shadow="sm" className="border border-divider">
-                    <CardBody className="p-2">
-                      <div className="space-y-1.5">
+                    <CardBody className="p-3">
+                      <div className="space-y-2">
                         {Object.entries(sku.attributes).map(([key, value]) => (
                           <div key={key} className="flex flex-col gap-0.5">
-                            <span className="text-[10px] text-default-500 uppercase tracking-wide">
+                            <span className="text-xs text-default-500 uppercase tracking-wide">
                               {key}
                             </span>
-                            <span className="text-xs font-medium truncate">
+                            <span className="text-sm font-medium truncate">
                               {value}
                             </span>
                           </div>
                         ))}
                         {sku.price && (
-                          <div className="pt-1.5 border-t border-divider">
-                            <div className="text-sm font-bold text-primary">
+                          <div className="pt-2 border-t border-divider">
+                            <div className="text-base font-bold text-primary">
                               ¥{sku.price.toFixed(2)}
                             </div>
                           </div>
                         )}
                         {sku.stock !== undefined && (
-                          <div className="text-[10px] text-default-500">
+                          <div className="text-xs text-default-500">
                             Stock: {sku.stock}
                           </div>
                         )}

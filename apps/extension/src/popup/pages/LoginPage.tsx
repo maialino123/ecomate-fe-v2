@@ -28,8 +28,8 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-[400px] flex flex-col items-center justify-center p-6 bg-background">
-      <div className="w-full max-w-sm space-y-6">
+    <div className="w-[700px] h-[600px] flex flex-col items-center justify-center p-8 bg-background">
+      <div className="w-full max-w-md space-y-6">
         {/* Logo/Header */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center mb-4">
@@ -51,7 +51,7 @@ export function LoginPage() {
             onChange={e => setEmail(e.target.value)}
             isRequired
             autoComplete="email"
-            size="sm"
+            size="md"
           />
 
           <Input
@@ -62,10 +62,10 @@ export function LoginPage() {
             onChange={e => setPassword(e.target.value)}
             isRequired
             autoComplete="current-password"
-            size="sm"
+            size="md"
           />
 
-          <Checkbox isSelected={rememberMe} onValueChange={setRememberMe} size="sm">
+          <Checkbox isSelected={rememberMe} onValueChange={setRememberMe} size="md">
             <span className="text-sm text-foreground">Remember me</span>
           </Checkbox>
 
@@ -75,7 +75,8 @@ export function LoginPage() {
             fullWidth
             isLoading={loading}
             isDisabled={!email || !password}
-            size="md"
+            size="lg"
+            className="mt-2"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </Button>

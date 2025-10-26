@@ -38,7 +38,7 @@ export function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="w-[600px] h-[500px] bg-background p-4 flex flex-col gap-4">
+      <div className="w-[700px] h-[600px] bg-background p-4 flex flex-col gap-4">
         <div>
           <Skeleton className="h-6 w-24 rounded mb-2" />
           <Skeleton className="h-3 w-48 rounded" />
@@ -58,7 +58,7 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="w-[600px] h-[500px] bg-background p-4 flex flex-col gap-4">
+    <div className="w-[700px] h-[600px] bg-background p-4 flex flex-col gap-4">
       {/* Header */}
       <div>
         <h2 className="text-lg font-bold">Settings</h2>
