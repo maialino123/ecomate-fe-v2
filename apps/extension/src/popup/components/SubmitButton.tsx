@@ -8,6 +8,7 @@ import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from
 import type { Product1688 } from '@workspace/lib';
 import { toast } from 'sonner';
 import { getApi } from '../../shared/api-client';
+import { getConfig } from '../../shared/storage';
 import { useExtractStore } from '../store/extract';
 
 interface Props {
@@ -113,12 +114,42 @@ export function SubmitButton({ data, onSuccess }: Props) {
     }
   };
 
-  const handleViewExisting = () => {
+  const handleViewExisting = async () => {
     if (duplicateInfo?.productId) {
-      // Open admin panel to view existing product
-      chrome.tabs.create({
-        url: `/dashboard/1688-products/${duplicateInfo.productId}`,
-      });
+      try {
+        // Get config to determine admin URL
+        const config = await getConfig();
+
+        // Convert API URL to admin URL
+        // API: https://ecomate-be-staging.up.railway.app
+        // Admin: https://ecomate-admin.vercel.app (or localhost:3001 for dev)
+        const apiUrl = config.apiUrl;
+        let adminUrl: string;
+
+        if (apiUrl.includes('localhost') || apiUrl.includes('127.0.0.1')) {
+          // Development environment
+          adminUrl = 'http://localhost:3001';
+        } else if (apiUrl.includes('staging')) {
+          // Staging environment - update this URL when you have admin staging
+          adminUrl = 'https://ecomate-admin-staging.vercel.app';
+        } else {
+          // Production environment
+          adminUrl = 'https://ecomate-admin.vercel.app';
+        }
+
+        // Determine the correct path based on product type
+        const path = duplicateInfo.productType === 'product'
+          ? `products/${duplicateInfo.productId}`
+          : `1688-products/${duplicateInfo.productId}`;
+
+        // Open admin panel to view existing product
+        chrome.tabs.create({
+          url: `${adminUrl}/dashboard/${path}`,
+        });
+      } catch (error) {
+        console.error('Failed to open existing product:', error);
+        toast.error('Failed to open product page');
+      }
     }
   };
 

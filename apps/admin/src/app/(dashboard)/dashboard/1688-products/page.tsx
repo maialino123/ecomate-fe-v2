@@ -121,6 +121,8 @@ function Product1688ListPageContent() {
                             src={product.thumbnail}
                             alt={product.nameZh}
                             className="w-12 h-12 object-cover rounded"
+                            referrerPolicy="no-referrer"
+                            crossOrigin="anonymous"
                           />
                         )}
                         <div className="flex-1 min-w-0">
