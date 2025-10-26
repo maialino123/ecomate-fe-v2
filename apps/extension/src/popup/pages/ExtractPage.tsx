@@ -6,12 +6,15 @@
 import { useExtractStore } from '../store/extract';
 import { PreviewPanel } from '../components/PreviewPanel';
 import { DownloadButton } from '../components/DownloadButton';
+import { SubmitButton } from '../components/SubmitButton';
 import { InlineStats } from '../components/InlineStats';
 import { ExtractButton } from '../components/ExtractButton';
 import { Alert, AlertDescription } from '../components/ui/alert';
+import { useProductsStore } from '../store/products';
 
 export function ExtractPage() {
   const { data, loading, error } = useExtractStore();
+  const { fetchCount } = useProductsStore();
 
   return (
     <div className="w-[600px] h-[500px] bg-background flex flex-col">
@@ -54,8 +57,15 @@ export function ExtractPage() {
             <PreviewPanel data={data} />
           </div>
 
-          {/* Sticky Download Button */}
-          <div className="sticky bottom-0 bg-background border-t px-3 py-2">
+          {/* Sticky Action Buttons */}
+          <div className="sticky bottom-0 bg-background border-t px-3 py-2 space-y-2">
+            <SubmitButton
+              data={data}
+              onSuccess={() => {
+                // Refresh product count after successful submit
+                fetchCount();
+              }}
+            />
             <DownloadButton data={data} />
           </div>
         </>

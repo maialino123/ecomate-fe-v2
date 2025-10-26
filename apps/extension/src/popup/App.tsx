@@ -10,6 +10,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { LoginPage } from './pages/LoginPage';
 import { Toaster } from 'sonner';
 import { useAuthStore } from './store/auth';
+import { useProductsStore } from './store/products';
 
 type View = 'extract' | 'settings';
 
@@ -17,11 +18,19 @@ export function App() {
   const [view, setView] = useState<View>('extract');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const { user, initialized, checkAuth } = useAuthStore();
+  const { count, fetchCount } = useProductsStore();
 
   // Check auth on mount
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // Fetch product count when authenticated
+  useEffect(() => {
+    if (user) {
+      fetchCount();
+    }
+  }, [user, fetchCount]);
 
   // Load theme from storage on mount
   useEffect(() => {
@@ -105,7 +114,14 @@ export function App() {
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Extract
+              <span className="flex items-center justify-center gap-2">
+                Extract
+                {count > 0 && (
+                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-semibold text-white bg-primary rounded-full">
+                    {count}
+                  </span>
+                )}
+              </span>
             </button>
             <button
               onClick={() => setView('settings')}
