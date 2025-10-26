@@ -73,6 +73,7 @@ export function SubmitButton({ data, onSuccess }: Props) {
           attributes: sku.attributes,
           price: sku.price || minPrice,
           stock: sku.stock,
+          image: sku.image,
         })) : undefined,
         supplierName: data.supplierName,
         supplierId1688: data.supplierId,
