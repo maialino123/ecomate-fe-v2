@@ -70,7 +70,12 @@ export function Product1688Tabs({ product, onRefetch }: Product1688TabsProps) {
       </Tabs.Content>
 
       <Tabs.Content value="variants" className="focus:outline-none">
-        <VariantGrid variants={product.variants || []} basePrice={product.priceMinCNY} />
+        <VariantGrid
+          productId={product.id}
+          variants={product.variants || []}
+          basePrice={product.priceMinCNY}
+          onUpdate={onRefetch}
+        />
       </Tabs.Content>
     </Tabs.Root>
   )
