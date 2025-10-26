@@ -7,9 +7,11 @@ import { create } from 'zustand';
 import type { User } from '@workspace/lib';
 import { getApi, resetApi, updateCachedTokens } from '../../shared/api-client';
 import {
-  saveTokens,
+  saveTokensSession,
+  saveTokensPersistent,
+  saveUserInfoSession,
+  saveUserInfoPersistent,
   clearTokens,
-  saveUserInfo,
   getUserInfo,
   isAuthenticated as checkAuthStatus,
 } from '../../shared/storage';
@@ -49,24 +51,32 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         throw new Error('Invalid response from server');
       }
 
-      // Save tokens based on "Remember me" choice
-      // If not remember me, we still save but they'll be cleared on browser close
-      await saveTokens({
+      const tokens = {
         accessToken: response.accessToken,
-        refreshToken: rememberMe ? response.refreshToken : '',
-      });
+        refreshToken: response.refreshToken,
+      };
 
-      // Update cached tokens
-      updateCachedTokens(response.accessToken, response.refreshToken);
-
-      // Save user info
-      await saveUserInfo({
+      const userInfo = {
         id: response.user.id,
         email: response.user.email,
         firstName: response.user.firstName,
         lastName: response.user.lastName,
         role: response.user.role,
-      });
+      };
+
+      // Save tokens and user info based on "Remember me" choice
+      if (rememberMe) {
+        // Persistent storage - survives browser restart
+        await saveTokensPersistent(tokens);
+        await saveUserInfoPersistent(userInfo);
+      } else {
+        // Session storage - cleared when browser closes
+        await saveTokensSession(tokens);
+        await saveUserInfoSession(userInfo);
+      }
+
+      // Update cached tokens in memory for API client
+      updateCachedTokens(response.accessToken, response.refreshToken);
 
       set({ user: response.user, loading: false });
 

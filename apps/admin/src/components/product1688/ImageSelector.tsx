@@ -10,11 +10,11 @@ import { cn } from '@workspace/ui/lib/utils'
 interface ImageSelectorProps {
   productId: string
   images: string[]
-  selectedImages: string[]
+  selectedImages?: string[]
   onSuccess: () => void
 }
 
-export function ImageSelector({ productId, images, selectedImages: initialSelected, onSuccess }: ImageSelectorProps) {
+export function ImageSelector({ productId, images, selectedImages: initialSelected = [], onSuccess }: ImageSelectorProps) {
   const api = useApi()
   const [selected, setSelected] = useState<Set<string>>(new Set(initialSelected))
   const [isLoading, setIsLoading] = useState(false)
