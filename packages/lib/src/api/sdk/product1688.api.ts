@@ -12,6 +12,9 @@ import {
   QueryProduct1688Request,
   Product1688ListResponse,
   DuplicateCheckResponse,
+  SaveCostCalculationRequest,
+  SaveCostCalculationResponse,
+  VariantCostHistoryResponse,
 } from '../../types/product1688.types';
 
 /**
@@ -104,6 +107,32 @@ export class Product1688Api {
    */
   async delete(id: string): Promise<{ success: boolean }> {
     const response = await this.client.delete<{ success: boolean }>(`/v1/1688-products/${id}`);
+    return response.data;
+  }
+
+  /**
+   * Save variant cost calculation
+   */
+  async saveVariantCostCalculation(
+    data: SaveCostCalculationRequest
+  ): Promise<SaveCostCalculationResponse> {
+    const response = await this.client.post<SaveCostCalculationResponse>(
+      '/v1/1688-products/variant-cost/calculate',
+      data
+    );
+    return response.data;
+  }
+
+  /**
+   * Get variant cost calculation history
+   */
+  async getVariantCostHistory(
+    productId: string,
+    variantSku: string
+  ): Promise<VariantCostHistoryResponse> {
+    const response = await this.client.get<VariantCostHistoryResponse>(
+      `/v1/1688-products/${productId}/variant-cost/${encodeURIComponent(variantSku)}`
+    );
     return response.data;
   }
 }

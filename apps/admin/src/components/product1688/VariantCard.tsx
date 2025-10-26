@@ -1,16 +1,22 @@
 'use client'
 
 import { Product1688Variant } from '@workspace/lib'
-import { Package } from 'lucide-react'
+import { Package, Calculator, TrendingUp } from 'lucide-react'
 
 interface VariantCardProps {
   variant: Product1688Variant
   basePrice: number
+  onClick?: () => void
 }
 
-export function VariantCard({ variant, basePrice }: VariantCardProps) {
+export function VariantCard({ variant, basePrice, onClick }: VariantCardProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-md transition-shadow ${
+        onClick ? 'cursor-pointer hover:border-blue-500 border border-transparent' : ''
+      }`}
+      onClick={onClick}
+    >
       <div className="flex gap-4">
         {/* Variant Image */}
         <div className="flex-shrink-0">
@@ -67,6 +73,35 @@ export function VariantCard({ variant, basePrice }: VariantCardProps) {
               <span className="text-sm text-gray-600 dark:text-gray-400">Stock: {variant.stock}</span>
             )}
           </div>
+
+          {/* Cost Calculation Info */}
+          {variant.costCalculation && (
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="font-medium">
+                    {new Intl.NumberFormat('vi-VN').format(
+                      variant.costCalculation.suggestedSellingPrice
+                    )}{' '}
+                    VND
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  Profit: +
+                  {new Intl.NumberFormat('vi-VN').format(variant.costCalculation.netProfit)} VND
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Calculator Icon Hint */}
+          {onClick && (
+            <div className="mt-2 flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+              <Calculator className="w-3 h-3" />
+              <span>Click to calculate cost</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

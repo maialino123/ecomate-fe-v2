@@ -27,6 +27,15 @@ export interface Product1688Variant {
   price: number;
   stock?: number;
   image?: string;
+  costCalculation?: {
+    // Latest cost calculation results
+    baseCost: number;
+    effectiveCost: number;
+    suggestedSellingPrice: number;
+    netProfit: number;
+    breakEvenPrice: number;
+    lastCalculatedAt: string;
+  };
 }
 
 export interface CostCalculation {
@@ -185,4 +194,71 @@ export interface Product1688ListResponse {
   total: number;
   page: number;
   limit: number;
+}
+
+// Variant Cost Calculation Types
+export interface SaveCostCalculationRequest {
+  product1688Id: string;
+  variantSku: string;
+  importPrice: number;
+  domesticShippingCN?: number;
+  internationalShippingVN?: number;
+  handlingFee?: number;
+  exchangeRateCNY: number;
+  quantity?: number;
+  returnRate?: number;
+  platformFeeRate?: number;
+  profitMarginRate?: number;
+  notes?: string;
+}
+
+export interface CostCalculationResult {
+  baseCost: number;
+  effectiveCost: number;
+  suggestedSellingPrice: number;
+  netProfit: number;
+  breakEvenPrice: number;
+}
+
+export interface VariantCostHistoryItem {
+  id: string;
+  product1688Id: string;
+  variantSku: string;
+  userId: string;
+  importPrice: number;
+  domesticShippingCN: number;
+  internationalShippingVN: number;
+  handlingFee: number;
+  exchangeRateCNY: number;
+  quantity: number;
+  returnRate: number;
+  platformFeeRate: number;
+  profitMarginRate: number;
+  baseCost: number;
+  effectiveCost: number;
+  suggestedSellingPrice: number;
+  netProfit: number;
+  breakEvenPrice: number;
+  calculationData?: any;
+  notes?: string;
+  createdAt: string;
+  user?: {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+  };
+}
+
+export interface SaveCostCalculationResponse {
+  success: boolean;
+  calculation: VariantCostHistoryItem;
+  result: CostCalculationResult;
+}
+
+export interface VariantCostHistoryResponse {
+  product1688Id: string;
+  variantSku: string;
+  total: number;
+  history: VariantCostHistoryItem[];
 }
