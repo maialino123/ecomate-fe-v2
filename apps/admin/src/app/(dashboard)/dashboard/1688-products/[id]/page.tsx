@@ -141,6 +141,8 @@ function Product1688DetailPageContent() {
                     src={image}
                     alt={`Product image ${index + 1}`}
                     className="w-full h-48 object-cover rounded-lg"
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
                   />
                 ))}
               </div>
