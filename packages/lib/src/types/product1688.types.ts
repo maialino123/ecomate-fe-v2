@@ -26,6 +26,7 @@ export interface Product1688Variant {
   attributes: Record<string, string>;
   price: number;
   stock?: number;
+  image?: string;
 }
 
 export interface CostCalculation {
@@ -57,6 +58,7 @@ export interface Product1688Entity {
   supplierName?: string;
   supplierId1688?: string;
   images: string[];
+  selectedImages: string[];
   thumbnail?: string;
   status: Product1688Status;
   rejectionReason?: RejectionReason;
@@ -109,6 +111,7 @@ export interface UpdateProduct1688Request {
   descriptionVi?: string;
   variants?: Product1688Variant[];
   costCalculation?: CostCalculation;
+  selectedImages?: string[];
 }
 
 export interface TranslateProduct1688Request {
