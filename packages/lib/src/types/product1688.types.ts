@@ -133,7 +133,7 @@ export interface RejectProduct1688Request {
 export interface QueryProduct1688Request {
   status?: Product1688Status;
   search?: string;
-  sortBy?: 'createdAt' | 'updatedAt' | 'priceMinCNY';
+  sortBy?: 'createdAt' | 'updatedAt' | 'priceMinCNY' | 'nameZh';
   sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
