@@ -41,7 +41,7 @@ export interface CostCalculation {
   finalPriceVND?: number;
 }
 
-export interface Product1688 {
+export interface Product1688Entity {
   id: string;
   nameZh: string;
   descriptionZh?: string;
@@ -142,7 +142,7 @@ export interface QueryProduct1688Request {
 // Response types
 export interface CreateProduct1688Response {
   success: boolean;
-  data?: Product1688;
+  data?: Product1688Entity;
   error?: string;
   existingId?: string;
   existingType?: 'product1688' | 'product';
@@ -167,18 +167,18 @@ export interface TranslationProgress {
 }
 
 export interface TranslateProduct1688Response {
-  product: Product1688;
+  product: Product1688Entity;
   progress: TranslationProgress;
 }
 
 export interface ApproveProduct1688Response {
   success: boolean;
   product: any; // Product type
-  product1688: Product1688;
+  product1688: Product1688Entity;
 }
 
 export interface Product1688ListResponse {
-  data: Product1688[];
+  data: Product1688Entity[];
   total: number;
   page: number;
   limit: number;

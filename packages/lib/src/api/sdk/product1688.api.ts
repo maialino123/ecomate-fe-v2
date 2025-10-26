@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import {
-  Product1688,
+  Product1688Entity,
   CreateProduct1688Request,
   CreateProduct1688Response,
   UpdateProduct1688Request,
@@ -53,16 +53,16 @@ export class Product1688Api {
   /**
    * Get single product by ID
    */
-  async getById(id: string): Promise<Product1688> {
-    const response = await this.client.get<Product1688>(`/v1/1688-products/${id}`);
+  async getById(id: string): Promise<Product1688Entity> {
+    const response = await this.client.get<Product1688Entity>(`/v1/1688-products/${id}`);
     return response.data;
   }
 
   /**
    * Update product (manual edits)
    */
-  async update(id: string, data: UpdateProduct1688Request): Promise<Product1688> {
-    const response = await this.client.patch<Product1688>(`/v1/1688-products/${id}`, data);
+  async update(id: string, data: UpdateProduct1688Request): Promise<Product1688Entity> {
+    const response = await this.client.patch<Product1688Entity>(`/v1/1688-products/${id}`, data);
     return response.data;
   }
 
@@ -94,8 +94,8 @@ export class Product1688Api {
   /**
    * Reject product
    */
-  async reject(id: string, data: RejectProduct1688Request): Promise<Product1688> {
-    const response = await this.client.post<Product1688>(`/v1/1688-products/${id}/reject`, data);
+  async reject(id: string, data: RejectProduct1688Request): Promise<Product1688Entity> {
+    const response = await this.client.post<Product1688Entity>(`/v1/1688-products/${id}/reject`, data);
     return response.data;
   }
 
