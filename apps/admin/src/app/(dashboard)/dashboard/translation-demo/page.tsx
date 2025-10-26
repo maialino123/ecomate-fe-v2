@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@workspace/ui/components/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@workspace/ui/components/Card';
 import { TranslateButton, BatchTranslateButton } from '@/components/translation';
 import { useApi } from '@workspace/shared/providers';
 import type { TranslationStats } from '@workspace/lib';

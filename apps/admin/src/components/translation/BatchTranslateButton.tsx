@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@workspace/ui/components/button';
+import { Button } from '@workspace/ui/components/Button';
 import { useNotificationStore } from '@workspace/lib/stores';
 import { useApi } from '@workspace/shared/providers';
 import { Languages, Loader2, CheckCircle2 } from 'lucide-react';
