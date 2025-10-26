@@ -1,0 +1,29 @@
+# Build output
+dist/
+dist-extension/
+releases/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Keep example file
+!.env.example
+!.env.production
+
+# Dependencies
+node_modules/
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
