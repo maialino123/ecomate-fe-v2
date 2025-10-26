@@ -15,4 +15,5 @@ export * from './components/permissions'
 
 // 1688 Product Types & Normalizers
 export * from './types/product-1688'
+export * from './types/product1688.types'
 export * from './normalizers/normalize-1688'
