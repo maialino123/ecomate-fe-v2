@@ -19,7 +19,7 @@ interface DuplicateInfo {
   exists: boolean;
   productId?: string;
   productName?: string;
-  status?: string;
+  productType?: 'product1688' | 'product';
 }
 
 export function SubmitButton({ data, onSuccess }: Props) {
@@ -36,15 +36,15 @@ export function SubmitButton({ data, onSuccess }: Props) {
 
       // Check for duplicates first (unless forcing)
       if (!force) {
-        const duplicateCheck = await api.product1688.checkDuplicate(data.url);
+        const duplicateCheck = await api.product1688.checkDuplicate(data.sourceUrl);
 
-        if (duplicateCheck.exists && duplicateCheck.product) {
+        if (duplicateCheck.exists) {
           // Show duplicate warning modal
           setDuplicateInfo({
             exists: true,
-            productId: duplicateCheck.product.id,
-            productName: duplicateCheck.product.nameZh,
-            status: duplicateCheck.product.status,
+            productId: duplicateCheck.id,
+            productName: duplicateCheck.name,
+            productType: duplicateCheck.type,
           });
           setShowDuplicateModal(true);
           setLoading(false);
@@ -52,24 +52,29 @@ export function SubmitButton({ data, onSuccess }: Props) {
         }
       }
 
+      // Calculate min and max prices from price tiers
+      const prices = data.priceTiers.map(tier => tier.price);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+
       // Submit product to backend
       const response = await api.product1688.create({
         nameZh: data.title,
         descriptionZh: data.description || '',
-        originalUrl: data.url,
-        priceMinCNY: data.priceRange.min,
-        priceMaxCNY: data.priceRange.max || data.priceRange.min,
-        currency: 'CNY',
-        variants: data.skus.map((sku, index) => ({
-          name: sku.specText || `Variant ${index + 1}`,
-          price: sku.price,
-          properties: sku.propPath ? JSON.parse(JSON.stringify(sku.propPath)) : {},
-          stock: sku.canBookCount,
-          sku: sku.skuId,
-        })),
-        rawData: data,
-        images: data.images.map(img => img.fullPathImageUrl || img.url),
-        mainImage: data.images[0]?.fullPathImageUrl || data.images[0]?.url,
+        originalUrl: data.sourceUrl,
+        priceMinCNY: minPrice,
+        priceMaxCNY: maxPrice !== minPrice ? maxPrice : undefined,
+        images: data.images.main,
+        thumbnail: data.images.main[0],
+        variants: data.skus.length > 0 ? data.skus.map((sku, index) => ({
+          sku: sku.skuId || `SKU-${index + 1}`,
+          nameZh: Object.entries(sku.attributes).map(([k, v]) => `${k}:${v}`).join(', ') || `Variant ${index + 1}`,
+          attributes: sku.attributes,
+          price: sku.price || minPrice,
+          stock: sku.stock,
+        })) : undefined,
+        supplierName: data.supplierName,
+        supplierId1688: data.supplierId,
       });
 
       // Clear extracted data
@@ -189,7 +194,7 @@ export function SubmitButton({ data, onSuccess }: Props) {
                 {duplicateInfo?.productName}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Status: {duplicateInfo?.status?.replace(/_/g, ' ')}
+                Type: {duplicateInfo?.productType === 'product' ? 'Product (Approved)' : 'Product1688'}
               </p>
             </div>
             <p className="text-sm text-muted-foreground mt-2">
