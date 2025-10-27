@@ -162,7 +162,7 @@ export default function Footer() {
             {/* Social Icons */}
             <div className="flex items-center gap-4">
               <a
-                href="https://facebook.com/ecomate"
+                href="https://www.facebook.com/profile.php?id=61582768598900"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:border-blue-400 hover:bg-blue-400/10 transition-all group"
