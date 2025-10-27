@@ -61,13 +61,15 @@ export default function Footer() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <h4 className="text-lg font-semibold text-white mb-4">Liên kết</h4>
+            <h4 className="text-lg font-semibold text-white mb-4">Khám phá</h4>
             <ul className="space-y-3">
               {[
                 { name: "Sản phẩm", href: "#products" },
                 { name: "Về chúng tôi", href: "#about" },
-                { name: "Blog", href: "#blog" },
+                { name: "Blog", href: "/blog" },
                 { name: "Liên hệ", href: "#contact" },
+                { name: "Đồ gia dụng Hà Nội", href: "/do-gia-dung-ha-noi-freeship-300k" },
+                { name: "Mẹo sắp xếp tủ bếp", href: "/meo-sap-xep-tu-bep-nhanh" },
               ].map((link, idx) => (
                 <li key={idx}>
                   <a
