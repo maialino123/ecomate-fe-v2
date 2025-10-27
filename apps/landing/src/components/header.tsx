@@ -20,6 +20,9 @@ export default function Header() {
                 // Ẩn header chỉ khi đã scroll QUA 3D tour section (bottom < 0)
                 const hasPassedTour = rect.bottom < 0
                 setShowHeader(!hasPassedTour)
+            } else {
+                // Nếu không có #tour section (như trang blog), luôn hiển thị header
+                setShowHeader(true)
             }
         }
 
