@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { useApi } from '@workspace/shared/providers'

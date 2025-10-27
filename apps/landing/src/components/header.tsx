@@ -2,6 +2,8 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
+import logo from '@/../public/images/logo.png'
 
 export default function Header() {
     const [scrolled, setScrolled] = useState(false)
@@ -37,11 +39,13 @@ export default function Header() {
         >
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-xl">E</span>
-                    </div>
-                    <span className="text-white font-semibold text-xl">Ecomate</span>
+                <Link href="/" className="flex items-center">
+                    <Image
+                        src={logo}
+                        alt="Ecomate Logo"
+                        className="h-10 w-auto"
+                        priority
+                    />
                 </Link>
 
                 {/* Desktop Navigation */}

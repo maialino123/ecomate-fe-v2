@@ -56,11 +56,21 @@ function ApartmentModel({ onDebugInfo }: { onDebugInfo: (info: DebugInfo) => voi
 
     // Tối ưu rendering
     scene.traverse(obj => {
-        obj.frustumCulled = false // Tắt frustum culling tạm thời để debug
+        obj.frustumCulled = true // Bật frustum culling để tối ưu performance
         if ((obj as THREE.Mesh).isMesh) {
             const m = obj as THREE.Mesh
             m.castShadow = false
             m.receiveShadow = true
+
+            // Optimize materials
+            if (m.material) {
+                const materials = Array.isArray(m.material) ? m.material : [m.material]
+                materials.forEach(mat => {
+                    if (mat instanceof THREE.MeshStandardMaterial) {
+                        mat.needsUpdate = false
+                    }
+                })
+            }
         }
     })
 
@@ -315,11 +325,13 @@ export default function ScrollStage() {
                         : ((WAYPOINTS[0]?.pos.toArray() ?? [-0.02, 5.6, -3.04]) as [number, number, number]),
                     fov: USE_ORBIT_CONTROLS ? 60 : 50,
                 }}
-                dpr={[1, 2]}
+                dpr={[1, 1.5]}
                 gl={{
                     antialias: false,
                     alpha: true,
-                    powerPreference: 'default',
+                    powerPreference: 'high-performance',
+                    stencil: false,
+                    depth: true,
                 }}
                 onCreated={({ gl }) => {
                     if (DEBUG_MODE) {

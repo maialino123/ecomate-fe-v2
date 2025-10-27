@@ -6,6 +6,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import dynamic from "next/dynamic";
 import { useTransition } from "@/contexts/transition-context";
 import { useTourStore, type TourSection } from "@/stores/tour-store";
+import { useShouldRender3D } from "@/hooks/use-media-query";
+import ImageTourSection from "@/components/image-tour-section";
 
 const ScrollStage = dynamic(() => import("@/components/scroll-stage"), {
   ssr: false,
@@ -13,7 +15,7 @@ const ScrollStage = dynamic(() => import("@/components/scroll-stage"), {
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function TourSection() {
+function TourSection3D() {
   const { setIsTransitioning } = useTransition();
   const sectionRef = useRef<HTMLDivElement>(null);
   const circleRef = useRef<HTMLDivElement>(null);
@@ -626,4 +628,18 @@ export default function TourSection() {
       </div>
     </section>
   );
+}
+
+// Main export component with conditional rendering
+export default function TourSection() {
+  const shouldRender3D = useShouldRender3D();
+
+  // Conditionally render 3D or Image version based on screen size
+  // Large Desktop (>1920px): render 3D model
+  // Mobile/Tablet/Laptop (<=1920px): render image-based tour
+  if (!shouldRender3D) {
+    return <ImageTourSection />;
+  }
+
+  return <TourSection3D />;
 }
