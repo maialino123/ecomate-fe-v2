@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import { useApi } from '@workspace/shared/providers'
 import { VariantCostHistoryItem } from '@workspace/lib'

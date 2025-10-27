@@ -12,7 +12,6 @@ const openSans = Open_Sans({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ecomate-fe-v2-landing.vercel.app'
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'Ecomate'
-const OG_IMAGE = `${SITE_URL}/og-image.jpg`
 
 export const viewport = {
     themeColor: '#10b981', // Emerald color matching your brand
@@ -53,10 +52,10 @@ export const metadata: Metadata = {
         type: 'website',
         images: [
             {
-                url: '/opengraph-image',
+                url: '/opengraph-image.png',
                 width: 1200,
                 height: 630,
-                alt: 'Ecomate',
+                alt: 'Ecomate - Tiện ích mỗi ngày cho gia đình hiện đại',
             },
         ],
     },
@@ -64,15 +63,23 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'Ecomate – Tiện ích mỗi ngày cho gia đình hiện đại',
         description: 'Khám phá Ecomate – người bạn đồng hành giúp cuộc sống gọn gàng, tiết kiệm và thông minh hơn.',
-        images: [OG_IMAGE],
+        images: ['/twitter-image.png'],
     },
     icons: {
         icon: [
             { url: '/favicon.ico' },
-            { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
-            { url: '/favicon-192.png', sizes: '192x192', type: 'image/png' },
+            // Light mode favicons (default)
+            { url: '/favicon-32.png', sizes: '32x32', type: 'image/png', media: '(prefers-color-scheme: light)' },
+            { url: '/favicon-192.png', sizes: '192x192', type: 'image/png', media: '(prefers-color-scheme: light)' },
+            // Dark mode favicons
+            { url: '/favicon-32-dark.png', sizes: '32x32', type: 'image/png', media: '(prefers-color-scheme: dark)' },
+            { url: '/favicon-192-dark.png', sizes: '192x192', type: 'image/png', media: '(prefers-color-scheme: dark)' },
         ],
-        apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+        apple: [
+            // Apple touch icons for light and dark mode
+            { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png', media: '(prefers-color-scheme: light)' },
+            { url: '/apple-touch-icon-dark.png', sizes: '180x180', type: 'image/png', media: '(prefers-color-scheme: dark)' },
+        ],
     },
     formatDetection: { telephone: false },
     robots: {

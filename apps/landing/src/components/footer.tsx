@@ -2,6 +2,8 @@
 import { motion } from "framer-motion";
 import { Facebook, ShoppingBag, Send, Mail, Phone, MapPin } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
+import logo from "@/../public/images/logo.png";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -24,7 +26,14 @@ export default function Footer() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h3 className="text-2xl font-bold text-white mb-4">Ecomate</h3>
+            <div className="mb-4">
+              <Image
+                src={logo}
+                alt="Ecomate Logo"
+                height={40}
+                className="h-10 w-auto"
+              />
+            </div>
             <p className="text-white/70 text-sm mb-6">
               Giải pháp thông minh cho không gian sống hiện đại.
               Sản phẩm chất lượng, giá cả hợp lý.
