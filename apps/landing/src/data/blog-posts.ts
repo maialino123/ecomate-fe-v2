@@ -102,5 +102,5 @@ export function getCategoryColorClasses(categoryId: string): {
         },
     }
 
-    return colorMap[color] || colorMap.gray
+    return colorMap[color] ?? colorMap.gray!
 }
