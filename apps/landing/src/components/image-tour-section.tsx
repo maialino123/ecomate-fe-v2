@@ -1,11 +1,11 @@
 'use client'
-import { useEffect, useRef, useCallback } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useRef, useCallback, useMemo, memo } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useTransition } from '@/contexts/transition-context'
 import { useTourStore, type TourSection } from '@/stores/tour-store'
 import Image, { type StaticImageData } from 'next/image'
+import { useDeviceCapabilities } from '@/hooks/useDeviceCapabilities'
 
 // Static imports for Next.js optimization
 import livingRoomImg from '@/../public/images/snapshot-banner/living-room.png'
@@ -26,9 +26,28 @@ const SECTION_IMAGES: Record<ImageTourSectionType, StaticImageData> = {
     bed: bedRoomImg,
 }
 
-export default function ImageTourSection() {
+function ImageTourSectionComponent() {
     const { setIsTransitioning } = useTransition()
     const sectionRef = useRef<HTMLDivElement>(null)
+
+    // Detect device capabilities for adaptive performance
+    const { isLowEndDevice, prefersReducedMotion, isMobile } = useDeviceCapabilities()
+
+    // Adaptive animation durations based on device capabilities
+    const animConfig = useMemo(() => {
+        const shouldSimplify = isLowEndDevice || prefersReducedMotion
+
+        return {
+            // Shorter durations for low-end devices
+            baseDuration: shouldSimplify ? 0.2 : 0.4,
+            revealDuration: shouldSimplify ? 0.4 : 0.6,
+            textStagger: shouldSimplify ? 0.05 : 0.1,
+            // Disable scale on low-end to reduce GPU load
+            useScale: !shouldSimplify,
+            // Simpler easing
+            ease: shouldSimplify ? 'power1.out' : 'power2.out',
+        }
+    }, [isLowEndDevice, prefersReducedMotion])
     const circleRef = useRef<HTMLDivElement>(null)
     const circleCollapseRef = useRef<HTMLDivElement>(null)
     const circleExitRef = useRef<HTMLDivElement>(null)
@@ -45,80 +64,141 @@ export default function ImageTourSection() {
     const bathImageRef = useRef<HTMLDivElement>(null)
     const bedImageRef = useRef<HTMLDivElement>(null)
 
-    // Zustand store
-    const {
-        isActivated,
-        currentSection,
-        circleAnimation,
-        showCanvas,
-        activate,
-        deactivate,
-        setCurrentSection,
-        setCircleAnimation,
-        setShowCanvas,
-        reset,
-    } = useTourStore()
+    // Text content element refs for GSAP animations
+    const scrollHintRef = useRef<HTMLDivElement>(null)
+    const livingTitleRef = useRef<HTMLHeadingElement>(null)
+    const livingDescRef = useRef<HTMLParagraphElement>(null)
+    const kitchenTitleRef = useRef<HTMLHeadingElement>(null)
+    const kitchenDescRef = useRef<HTMLParagraphElement>(null)
+    const bathTitleRef = useRef<HTMLHeadingElement>(null)
+    const bathDescRef = useRef<HTMLParagraphElement>(null)
+    const bedTitleRef = useRef<HTMLHeadingElement>(null)
+    const bedDescRef = useRef<HTMLParagraphElement>(null)
+    const ctaButtonRef = useRef<HTMLAnchorElement>(null)
 
-    // Helper function để ẩn tất cả text sections
+    // Memoize ref arrays to avoid recreation
+    const textRefs = useMemo(() => [livingTextRef, kitchenTextRef, bathTextRef, bedTextRef], [])
+    const imageRefs = useMemo(() => [livingImageRef, kitchenImageRef, bathImageRef, bedImageRef], [])
+
+    // Refs to hold latest callback versions for ScrollTrigger
+    // This prevents stale closures when animConfig updates after device detection
+    const showTextRef = useRef<(section: TourSection) => void>(() => {})
+    const showImageRef = useRef<(section: TourSection) => void>(() => {})
+    const hideAllTextsRef = useRef<() => void>(() => {})
+    const hideAllImagesRef = useRef<() => void>(() => {})
+
+    // Zustand store - Using selectors to prevent unnecessary re-renders
+    const isActivated = useTourStore(state => state.isActivated)
+    const currentSection = useTourStore(state => state.currentSection)
+    const circleAnimation = useTourStore(state => state.circleAnimation)
+    const showCanvas = useTourStore(state => state.showCanvas)
+    const activate = useTourStore(state => state.activate)
+    const deactivate = useTourStore(state => state.deactivate)
+    const setCurrentSection = useTourStore(state => state.setCurrentSection)
+    const setCircleAnimation = useTourStore(state => state.setCircleAnimation)
+    const setShowCanvas = useTourStore(state => state.setShowCanvas)
+    const reset = useTourStore(state => state.reset)
+
+    // Batch helper functions - GPU optimized with single gsap.set call
     const hideAllTexts = useCallback(() => {
-        ;[livingTextRef, kitchenTextRef, bathTextRef, bedTextRef].forEach(ref => {
-            if (ref.current) {
-                gsap.killTweensOf(ref.current)
-                gsap.to(ref.current, { opacity: 0, duration: 0.2 })
-            }
-        })
-    }, [])
+        const validRefs = textRefs.map(ref => ref.current).filter(Boolean)
+        if (validRefs.length === 0) return
 
-    // Helper function để ẩn tất cả images - GPU optimized
+        // Kill all tweens in batch
+        validRefs.forEach(el => gsap.killTweensOf(el))
+
+        // Batch animate with single call
+        gsap.to(validRefs, {
+            opacity: 0,
+            duration: 0.2,
+            overwrite: 'auto',
+        })
+    }, [textRefs])
+
+    // Helper function để ẩn tất cả images - GPU optimized with batch
     const hideAllImages = useCallback(() => {
-        ;[livingImageRef, kitchenImageRef, bathImageRef, bedImageRef].forEach(ref => {
-            if (ref.current) {
-                gsap.killTweensOf(ref.current)
-                gsap.to(ref.current, {
-                    opacity: 0,
-                    scale: 1.05,
-                    duration: 0.25,
-                    force3D: true,
-                })
-            }
+        const validRefs = imageRefs.map(ref => ref.current).filter(Boolean)
+        if (validRefs.length === 0) return
+
+        // Kill all tweens in batch
+        validRefs.forEach(el => gsap.killTweensOf(el))
+
+        // Batch animate with single call - adaptive based on device
+        gsap.to(validRefs, {
+            opacity: 0,
+            scale: animConfig.useScale ? 1.05 : 1.0,
+            duration: animConfig.baseDuration,
+            force3D: animConfig.useScale,
+            overwrite: 'auto',
+            ease: animConfig.ease,
         })
-    }, [])
+    }, [imageRefs, animConfig])
 
-    // Helper function để hiển thị text section cụ thể
-    const showText = useCallback((section: TourSection) => {
-        // Ẩn tất cả trước
-        ;[livingTextRef, kitchenTextRef, bathTextRef, bedTextRef].forEach(ref => {
-            if (ref.current) {
-                gsap.killTweensOf(ref.current)
-                gsap.to(ref.current, { opacity: 0, duration: 0.2 })
+    // Helper function để hiển thị text section cụ thể - Batch optimized
+    const showText = useCallback(
+        (section: TourSection) => {
+            // Skip if section is 'none'
+            if (section === 'none') return
+
+            // Batch hide all texts first
+            const validRefs = textRefs.map(ref => ref.current).filter(Boolean)
+            validRefs.forEach(el => gsap.killTweensOf(el))
+            gsap.set(validRefs, { opacity: 0 })
+
+            // Get section ref and inner element refs
+            let containerRef, titleRef, descRef, btnRef
+            switch (section as ImageTourSectionType) {
+                case 'living':
+                    containerRef = livingTextRef
+                    titleRef = livingTitleRef
+                    descRef = livingDescRef
+                    break
+                case 'kitchen':
+                    containerRef = kitchenTextRef
+                    titleRef = kitchenTitleRef
+                    descRef = kitchenDescRef
+                    break
+                case 'bath':
+                    containerRef = bathTextRef
+                    titleRef = bathTitleRef
+                    descRef = bathDescRef
+                    break
+                case 'bed':
+                    containerRef = bedTextRef
+                    titleRef = bedTitleRef
+                    descRef = bedDescRef
+                    btnRef = ctaButtonRef
+                    break
             }
-        })
 
-        // Skip if section is 'none'
-        if (section === 'none') return
+            if (containerRef?.current) {
+                // Create master timeline for batch animations
+                const tl = gsap.timeline()
 
-        // Hiển thị section cụ thể
-        let ref
-        switch (section as ImageTourSectionType) {
-            case 'living':
-                ref = livingTextRef
-                break
-            case 'kitchen':
-                ref = kitchenTextRef
-                break
-            case 'bath':
-                ref = bathTextRef
-                break
-            case 'bed':
-                ref = bedTextRef
-                break
-        }
+                // Show container
+                tl.to(containerRef.current, { opacity: 1, duration: animConfig.baseDuration })
 
-        if (ref.current) {
-            gsap.killTweensOf(ref.current)
-            gsap.to(ref.current, { opacity: 1, duration: 0.4 })
-        }
-    }, [])
+                // Batch animate inner elements with stagger - adaptive
+                const elements = [titleRef?.current, descRef?.current, btnRef?.current].filter(Boolean)
+                if (elements.length > 0) {
+                    tl.fromTo(
+                        elements,
+                        { opacity: 0, y: animConfig.useScale ? 20 : 10 },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: animConfig.revealDuration,
+                            stagger: animConfig.textStagger,
+                            ease: animConfig.ease,
+                            force3D: animConfig.useScale,
+                        },
+                        '-=0.2', // Overlap with container fade
+                    )
+                }
+            }
+        },
+        [textRefs, animConfig],
+    )
 
     // Helper function để hiển thị image section cụ thể
     const showImage = useCallback(
@@ -173,11 +253,33 @@ export default function ImageTourSection() {
         }
     }, [isActivated, currentSection, hideAllTexts, hideAllImages])
 
+    // Sync refs with latest callbacks to fix stale closure bug
+    // When animConfig updates (after device detection), callbacks recreate
+    // but ScrollTriggers registered with old versions - refs fix this
+    useEffect(() => {
+        showTextRef.current = showText
+        showImageRef.current = showImage
+        hideAllTextsRef.current = hideAllTexts
+        hideAllImagesRef.current = hideAllImages
+    }, [showText, showImage, hideAllTexts, hideAllImages])
+
+    // Animate scroll hint on mount
+    useEffect(() => {
+        if (scrollHintRef.current && !isActivated) {
+            gsap.to(scrollHintRef.current, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: 'power2.out',
+            })
+        }
+    }, [isActivated])
+
     // Effect để cleanup khi unmount hoặc page navigation
     useEffect(() => {
         return () => {
             // Force hide all texts on unmount
-            ;[livingTextRef, kitchenTextRef, bathTextRef, bedTextRef].forEach(ref => {
+            textRefs.forEach(ref => {
                 if (ref.current) {
                     gsap.killTweensOf(ref.current)
                     ref.current.style.opacity = '0'
@@ -185,7 +287,7 @@ export default function ImageTourSection() {
             })
 
             // Force hide images
-            ;[livingImageRef, kitchenImageRef, bathImageRef, bedImageRef].forEach(ref => {
+            imageRefs.forEach(ref => {
                 if (ref.current) {
                     gsap.killTweensOf(ref.current)
                     ref.current.style.opacity = '0'
@@ -198,7 +300,7 @@ export default function ImageTourSection() {
                 imageWrapRef.current.style.opacity = '0'
             }
         }
-    }, [])
+    }, [textRefs, imageRefs])
 
     useEffect(() => {
         if (!sectionRef.current) return
@@ -244,8 +346,8 @@ export default function ImageTourSection() {
 
                             // Immediately show living room content
                             setCurrentSection('living')
-                            showText('living')
-                            showImage('living')
+                            showTextRef.current('living')
+                            showImageRef.current('living')
                         },
                     })
 
@@ -318,8 +420,8 @@ export default function ImageTourSection() {
                       if (imageWrapRef.current) {
                           imageWrapRef.current.style.opacity = '0'
                       }
-                      hideAllTexts()
-                      hideAllImages()
+                      hideAllTextsRef.current()
+                      hideAllImagesRef.current()
                       setCurrentSection('none')
 
                       // Trigger circular collapse
@@ -381,24 +483,24 @@ export default function ImageTourSection() {
                 end: 'bottom 40%',
                 onEnter: () => {
                     setCurrentSection(section)
-                    showText(section)
-                    showImage(section)
+                    showTextRef.current(section)
+                    showImageRef.current(section)
                 },
                 onLeave: () => {
                     const currentState = useTourStore.getState()
                     if (currentState.currentSection === section) {
-                        hideAllTexts()
+                        hideAllTextsRef.current()
                     }
                 },
                 onEnterBack: () => {
                     setCurrentSection(section)
-                    showText(section)
-                    showImage(section)
+                    showTextRef.current(section)
+                    showImageRef.current(section)
                 },
                 onLeaveBack: () => {
                     const currentState = useTourStore.getState()
                     if (currentState.currentSection === section) {
-                        hideAllTexts()
+                        hideAllTextsRef.current()
                     }
                 },
                 markers: false,
@@ -418,8 +520,8 @@ export default function ImageTourSection() {
                       if (imageWrapRef.current) {
                           imageWrapRef.current.style.opacity = '0'
                       }
-                      hideAllTexts()
-                      hideAllImages()
+                      hideAllTextsRef.current()
+                      hideAllImagesRef.current()
                       setShowCanvas(false)
                       setCurrentSection('none')
 
@@ -536,74 +638,42 @@ export default function ImageTourSection() {
             ref={sectionRef}
             className="relative min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900"
         >
-            {/* Circular Reveal Overlay - GPU Optimized */}
-            <div
-                className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center"
-                style={{ display: circleAnimation === 'reveal' ? 'flex' : 'none' }}
-            >
+            {/* Unified Circular Overlay - Single compositing layer */}
+            {circleAnimation !== 'none' && (
                 <div
-                    ref={circleRef}
-                    className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-emerald-500 to-blue-600"
-                    style={{
-                        boxShadow: '0 0 60px rgba(16, 185, 129, 0.4), 0 0 120px rgba(59, 130, 246, 0.25)',
-                        willChange: 'transform, opacity',
-                        transform: 'scale(0) translateZ(0)',
-                        opacity: 0,
-                    }}
-                />
-            </div>
-
-            {/* Circular Collapse Overlay - GPU Optimized */}
-            <div
-                className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center"
-                style={{ display: circleAnimation === 'collapse' ? 'flex' : 'none' }}
-            >
-                <div
-                    ref={circleCollapseRef}
-                    className="absolute w-32 h-32 rounded-full"
-                    style={{
-                        background: 'linear-gradient(to bottom right, rgb(15 23 42), rgb(6 78 59), rgb(15 23 42))',
-                        boxShadow: '0 0 60px rgba(16, 185, 129, 0.25), 0 0 120px rgba(59, 130, 246, 0.15)',
-                        willChange: 'transform, opacity',
-                        transform: 'scale(50) translateZ(0)',
-                        opacity: 1,
-                    }}
-                />
-            </div>
-
-            {/* Circular Exit Overlay - GPU Optimized */}
-            <div
-                className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center"
-                style={{ display: circleAnimation === 'exit' ? 'flex' : 'none' }}
-            >
-                <div
-                    ref={circleExitRef}
-                    className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-blue-600 to-purple-600"
-                    style={{
-                        boxShadow: '0 0 60px rgba(59, 130, 246, 0.4), 0 0 120px rgba(147, 51, 234, 0.25)',
-                        willChange: 'transform, opacity',
-                        transform: 'scale(0) translateZ(0)',
-                        opacity: 0,
-                    }}
-                />
-            </div>
-
-            {/* Circular Re-entry Overlay - GPU Optimized */}
-            <div
-                className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center"
-                style={{ display: circleAnimation === 'reentry' ? 'flex' : 'none' }}
-            >
-                <div
-                    ref={circleReentryRef}
-                    className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-purple-600 to-blue-600"
-                    style={{
-                        boxShadow: '0 0 60px rgba(147, 51, 234, 0.4), 0 0 120px rgba(59, 130, 246, 0.25)',
-                        willChange: 'transform, opacity',
-                        transform: 'scale(50) translateZ(0)',
-                        opacity: 1,
-                    }}
-                />
-            </div>
+                    className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center"
+                    style={{ willChange: 'transform' }}
+                >
+                    <div
+                        ref={
+                            circleAnimation === 'reveal'
+                                ? circleRef
+                                : circleAnimation === 'collapse'
+                                  ? circleCollapseRef
+                                  : circleAnimation === 'exit'
+                                    ? circleExitRef
+                                    : circleReentryRef
+                        }
+                        className="absolute w-32 h-32 rounded-full"
+                        style={{
+                            background:
+                                circleAnimation === 'reveal'
+                                    ? 'linear-gradient(to bottom right, rgb(16 185 129), rgb(59 130 246))'
+                                    : circleAnimation === 'collapse'
+                                      ? 'linear-gradient(to bottom right, rgb(15 23 42), rgb(6 78 59), rgb(15 23 42))'
+                                      : circleAnimation === 'exit'
+                                        ? 'linear-gradient(to bottom right, rgb(37 99 235), rgb(147 51 234))'
+                                        : 'linear-gradient(to bottom right, rgb(147 51 234), rgb(37 99 235))',
+                            willChange: 'transform, opacity',
+                            transform:
+                                circleAnimation === 'reveal' || circleAnimation === 'exit'
+                                    ? 'scale(0) translateZ(0)'
+                                    : 'scale(50) translateZ(0)',
+                            opacity: circleAnimation === 'reveal' || circleAnimation === 'exit' ? 0 : 1,
+                        }}
+                    />
+                </div>
+            )}
 
             {/* Image Background - Fixed */}
             <div
@@ -614,9 +684,11 @@ export default function ImageTourSection() {
                     pointerEvents: 'none',
                     opacity: 0,
                     display: showCanvas ? 'block' : 'none',
+                    contentVisibility: 'auto',
+                    contain: 'layout paint size style',
                 }}
             >
-                {/* Living Room Image - Priority with eager loading */}
+                {/* Living Room Image - Priority loading, always rendered */}
                 <div
                     ref={livingImageRef}
                     className="absolute inset-0"
@@ -628,13 +700,13 @@ export default function ImageTourSection() {
                         fill
                         className="object-cover"
                         priority
-                        quality={90}
-                        sizes="100vw"
+                        quality={75}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
                         placeholder="blur"
                     />
                 </div>
 
-                {/* Kitchen Image - Lazy loading */}
+                {/* Kitchen Image - Always rendered for smooth transitions */}
                 <div
                     ref={kitchenImageRef}
                     className="absolute inset-0"
@@ -645,14 +717,14 @@ export default function ImageTourSection() {
                         alt="Nhà bếp Ecomate - Gọn gàng hiệu quả"
                         fill
                         className="object-cover"
-                        loading="lazy"
-                        quality={90}
-                        sizes="100vw"
+                        loading="eager"
+                        quality={75}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
                         placeholder="blur"
                     />
                 </div>
 
-                {/* Bath Image - Lazy loading */}
+                {/* Bath Image - Always rendered for smooth transitions */}
                 <div
                     ref={bathImageRef}
                     className="absolute inset-0"
@@ -663,14 +735,14 @@ export default function ImageTourSection() {
                         alt="Phòng tắm Ecomate - Sạch sẽ tiện lợi"
                         fill
                         className="object-cover"
-                        loading="lazy"
-                        quality={90}
-                        sizes="100vw"
+                        loading="eager"
+                        quality={75}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
                         placeholder="blur"
                     />
                 </div>
 
-                {/* Bed Image - Lazy loading */}
+                {/* Bed Image - Always rendered for smooth transitions */}
                 <div
                     ref={bedImageRef}
                     className="absolute inset-0"
@@ -681,9 +753,9 @@ export default function ImageTourSection() {
                         alt="Phòng ngủ Ecomate - Yên tĩnh ngăn nắp"
                         fill
                         className="object-cover"
-                        loading="lazy"
-                        quality={90}
-                        sizes="100vw"
+                        loading="eager"
+                        quality={75}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
                         placeholder="blur"
                     />
                 </div>
@@ -703,14 +775,13 @@ export default function ImageTourSection() {
                     {!isActivated && (
                         <div className="absolute inset-0 grid place-items-center px-6 z-20">
                             <div className="max-w-3xl text-center">
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.8 }}
+                                <div
+                                    ref={scrollHintRef}
                                     className="text-white/50 text-caption"
+                                    style={{ opacity: 0, transform: 'translateY(20px)' }}
                                 >
                                     Scroll xuống để bắt đầu
-                                </motion.div>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -722,17 +793,20 @@ export default function ImageTourSection() {
                         style={{ opacity: 0 }}
                     >
                         <div className="max-w-3xl text-center">
-                            <motion.h1
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ amount: 0.4, once: true }}
+                            <h1
+                                ref={livingTitleRef}
                                 className="text-4xl md:text-6xl font-semibold text-white"
+                                style={{ opacity: 0, transform: 'translateY(20px)' }}
                             >
                                 Tiện ích mỗi ngày,
                                 <br />
                                 <span className="text-emerald-300">trong từng căn phòng</span>
-                            </motion.h1>
-                            <p className="mt-4 text-white/80">
+                            </h1>
+                            <p
+                                ref={livingDescRef}
+                                className="mt-4 text-white/80"
+                                style={{ opacity: 0, transform: 'translateY(20px)' }}
+                            >
                                 Cuộn xuống để khám phá căn hộ Ecomate – nơi mỗi góc nhỏ đều có giải pháp thông minh.
                             </p>
                         </div>
@@ -747,23 +821,20 @@ export default function ImageTourSection() {
                         style={{ opacity: 0 }}
                     >
                         <div className="max-w-xl text-center">
-                            <motion.h2
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ amount: 0.4, once: true }}
+                            <h2
+                                ref={kitchenTitleRef}
                                 className="text-h4 md:text-h3 font-semibold text-white"
+                                style={{ opacity: 0, transform: 'translateY(20px)' }}
                             >
                                 Nhà bếp – gọn gàng & hiệu quả
-                            </motion.h2>
-                            <motion.p
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ amount: 0.4, once: true }}
-                                transition={{ delay: 0.1 }}
+                            </h2>
+                            <p
+                                ref={kitchenDescRef}
                                 className="mt-4 text-white/80"
+                                style={{ opacity: 0, transform: 'translateY(20px)' }}
                             >
                                 Móc dán chịu lực, kệ úp chén, bàn chải rửa cốc… mọi thứ đều trong tầm tay.
-                            </motion.p>
+                            </p>
                         </div>
                     </div>
                 </section>
@@ -776,23 +847,20 @@ export default function ImageTourSection() {
                         style={{ opacity: 0 }}
                     >
                         <div className="max-w-xl text-center">
-                            <motion.h2
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ amount: 0.4, once: true }}
+                            <h2
+                                ref={bathTitleRef}
                                 className="text-h4 md:text-h3 font-semibold text-white"
+                                style={{ opacity: 0, transform: 'translateY(20px)' }}
                             >
                                 Phòng tắm – sạch sẽ tiện lợi
-                            </motion.h2>
-                            <motion.p
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ amount: 0.4, once: true }}
-                                transition={{ delay: 0.1 }}
+                            </h2>
+                            <p
+                                ref={bathDescRef}
                                 className="mt-4 text-white/80"
+                                style={{ opacity: 0, transform: 'translateY(20px)' }}
                             >
                                 Giải pháp dán không khoan tường, khô nhanh, bền bỉ – an tâm sử dụng mỗi ngày.
-                            </motion.p>
+                            </p>
                         </div>
                     </div>
                 </section>
@@ -805,35 +873,30 @@ export default function ImageTourSection() {
                         style={{ opacity: 0 }}
                     >
                         <div className="max-w-xl text-center">
-                            <motion.h2
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ amount: 0.4, once: true }}
+                            <h2
+                                ref={bedTitleRef}
                                 className="text-h4 md:text-h3 font-semibold text-white"
+                                style={{ opacity: 0, transform: 'translateY(20px)' }}
                             >
                                 Phòng ngủ – yên tĩnh & ngăn nắp
-                            </motion.h2>
-                            <motion.p
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ amount: 0.4, once: true }}
-                                transition={{ delay: 0.1 }}
+                            </h2>
+                            <p
+                                ref={bedDescRef}
                                 className="mt-4 text-white/80"
+                                style={{ opacity: 0, transform: 'translateY(20px)' }}
                             >
                                 Hộp chứa đồ, kệ mini, đèn ngủ… giúp không gian luôn gọn gàng.
-                            </motion.p>
-                            <motion.a
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ amount: 0.4, once: true }}
-                                transition={{ delay: 0.2 }}
+                            </p>
+                            <a
+                                ref={ctaButtonRef}
                                 className="mt-6 inline-flex rounded-xl bg-emerald-600 px-6 py-3 text-white hover:bg-emerald-700 transition-colors pointer-events-auto"
                                 href="https://shopee.vn/ecomate"
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                style={{ opacity: 0, transform: 'translateY(20px)' }}
                             >
                                 Khám phá trên Shopee
-                            </motion.a>
+                            </a>
                         </div>
                     </div>
                 </section>
@@ -841,3 +904,7 @@ export default function ImageTourSection() {
         </section>
     )
 }
+
+// Export with React.memo for performance optimization
+// Component only re-renders when props change (currently no props)
+export default memo(ImageTourSectionComponent)
