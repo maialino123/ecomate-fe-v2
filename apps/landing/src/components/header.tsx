@@ -13,15 +13,12 @@ export default function Header() {
         const handleScroll = () => {
             setScrolled(window.scrollY > 50)
 
-            // Hiển thị header ở Hero và 3D Tour, ẩn khi ra khỏi 3D section
             const tourSection = document.querySelector('#tour')
             if (tourSection) {
                 const rect = tourSection.getBoundingClientRect()
-                // Ẩn header chỉ khi đã scroll QUA 3D tour section (bottom < 0)
                 const hasPassedTour = rect.bottom < 0
                 setShowHeader(!hasPassedTour)
             } else {
-                // Nếu không có #tour section (như trang blog), luôn hiển thị header
                 setShowHeader(true)
             }
         }
@@ -43,12 +40,7 @@ export default function Header() {
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="flex items-center">
-                    <Image
-                        src={logo}
-                        alt="Ecomate Logo"
-                        className="h-10 w-auto"
-                        priority
-                    />
+                    <Image src={logo} alt="Ecomate Logo" className="h-10 w-auto" priority />
                 </Link>
 
                 {/* Desktop Navigation */}

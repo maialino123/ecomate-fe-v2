@@ -38,10 +38,8 @@ export default function FeaturedGuides() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-12"
                 >
-                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                        Hướng dẫn & Tips hữu ích
-                    </h2>
-                    <p className="text-white/70 text-lg max-w-2xl mx-auto">
+                    <h2 className="text-h4 md:text-h3 font-bold text-white mb-4">Hướng dẫn & Tips hữu ích</h2>
+                    <p className="text-white/70 text-h6 max-w-2xl mx-auto">
                         Khám phá các bài viết hướng dẫn và mẹo hay để tối ưu không gian sống của bạn
                     </p>
                 </motion.div>
@@ -65,22 +63,20 @@ export default function FeaturedGuides() {
                                     {/* Icon & Title */}
                                     <div className="flex items-start gap-4 mb-4">
                                         <div
-                                            className={`p-3 rounded-xl bg-gradient-to-br ${guide.gradient} border border-${guide.accentColor}-500/30`}
+                                            className={`p-4 rounded-xl bg-gradient-to-br ${guide.gradient} border border-${guide.accentColor}-500/30`}
                                         >
-                                            <Icon
-                                                className={`h-6 w-6 text-${guide.accentColor}-400`}
-                                            />
+                                            <Icon className={`h-6 w-6 text-${guide.accentColor}-400`} />
                                         </div>
                                         <div className="flex-1">
-                                            <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                                            <h3 className="text-h6 font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors">
                                                 {guide.title}
                                             </h3>
                                             {/* Tags */}
-                                            <div className="flex flex-wrap gap-2 mb-3">
-                                                {guide.tags.map((tag) => (
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                {guide.tags.map(tag => (
                                                     <span
                                                         key={tag}
-                                                        className="text-xs px-2 py-1 rounded-full bg-white/10 text-white/70"
+                                                        className="text-caption px-4 py-2 rounded-full bg-white/10 text-white/70"
                                                     >
                                                         {tag}
                                                     </span>
@@ -90,9 +86,7 @@ export default function FeaturedGuides() {
                                     </div>
 
                                     {/* Description */}
-                                    <p className="text-white/70 mb-4 line-clamp-2">
-                                        {guide.description}
-                                    </p>
+                                    <p className="text-white/70 mb-4 line-clamp-2">{guide.description}</p>
 
                                     {/* CTA */}
                                     <div className="flex items-center gap-2 text-emerald-400 font-medium group-hover:gap-3 transition-all">
