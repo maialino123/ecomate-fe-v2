@@ -80,6 +80,13 @@ function ImageTourSectionComponent() {
     const textRefs = useMemo(() => [livingTextRef, kitchenTextRef, bathTextRef, bedTextRef], [])
     const imageRefs = useMemo(() => [livingImageRef, kitchenImageRef, bathImageRef, bedImageRef], [])
 
+    // Refs to hold latest callback versions for ScrollTrigger
+    // This prevents stale closures when animConfig updates after device detection
+    const showTextRef = useRef<(section: TourSection) => void>(() => {})
+    const showImageRef = useRef<(section: TourSection) => void>(() => {})
+    const hideAllTextsRef = useRef<() => void>(() => {})
+    const hideAllImagesRef = useRef<() => void>(() => {})
+
     // Zustand store - Using selectors to prevent unnecessary re-renders
     const isActivated = useTourStore(state => state.isActivated)
     const currentSection = useTourStore(state => state.currentSection)
@@ -246,6 +253,16 @@ function ImageTourSectionComponent() {
         }
     }, [isActivated, currentSection, hideAllTexts, hideAllImages])
 
+    // Sync refs with latest callbacks to fix stale closure bug
+    // When animConfig updates (after device detection), callbacks recreate
+    // but ScrollTriggers registered with old versions - refs fix this
+    useEffect(() => {
+        showTextRef.current = showText
+        showImageRef.current = showImage
+        hideAllTextsRef.current = hideAllTexts
+        hideAllImagesRef.current = hideAllImages
+    }, [showText, showImage, hideAllTexts, hideAllImages])
+
     // Animate scroll hint on mount
     useEffect(() => {
         if (scrollHintRef.current && !isActivated) {
@@ -329,8 +346,8 @@ function ImageTourSectionComponent() {
 
                             // Immediately show living room content
                             setCurrentSection('living')
-                            showText('living')
-                            showImage('living')
+                            showTextRef.current('living')
+                            showImageRef.current('living')
                         },
                     })
 
@@ -403,8 +420,8 @@ function ImageTourSectionComponent() {
                       if (imageWrapRef.current) {
                           imageWrapRef.current.style.opacity = '0'
                       }
-                      hideAllTexts()
-                      hideAllImages()
+                      hideAllTextsRef.current()
+                      hideAllImagesRef.current()
                       setCurrentSection('none')
 
                       // Trigger circular collapse
@@ -466,24 +483,24 @@ function ImageTourSectionComponent() {
                 end: 'bottom 40%',
                 onEnter: () => {
                     setCurrentSection(section)
-                    showText(section)
-                    showImage(section)
+                    showTextRef.current(section)
+                    showImageRef.current(section)
                 },
                 onLeave: () => {
                     const currentState = useTourStore.getState()
                     if (currentState.currentSection === section) {
-                        hideAllTexts()
+                        hideAllTextsRef.current()
                     }
                 },
                 onEnterBack: () => {
                     setCurrentSection(section)
-                    showText(section)
-                    showImage(section)
+                    showTextRef.current(section)
+                    showImageRef.current(section)
                 },
                 onLeaveBack: () => {
                     const currentState = useTourStore.getState()
                     if (currentState.currentSection === section) {
-                        hideAllTexts()
+                        hideAllTextsRef.current()
                     }
                 },
                 markers: false,
@@ -503,8 +520,8 @@ function ImageTourSectionComponent() {
                       if (imageWrapRef.current) {
                           imageWrapRef.current.style.opacity = '0'
                       }
-                      hideAllTexts()
-                      hideAllImages()
+                      hideAllTextsRef.current()
+                      hideAllImagesRef.current()
                       setShowCanvas(false)
                       setCurrentSection('none')
 
