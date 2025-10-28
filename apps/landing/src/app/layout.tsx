@@ -5,9 +5,10 @@ import type { Metadata } from 'next'
 import SeoJsonLd from '@/components/SeoJsonLd'
 
 const openSans = Open_Sans({
-    subsets: ['latin'],
+    subsets: ['latin', 'vietnamese'],
     display: 'swap',
     variable: '--font-open-sans',
+    weight: ['400', '500', '600', '700'],
 })
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ecomate-fe-v2-landing.vercel.app'
@@ -73,12 +74,27 @@ export const metadata: Metadata = {
             { url: '/favicon-192.png', sizes: '192x192', type: 'image/png', media: '(prefers-color-scheme: light)' },
             // Dark mode favicons
             { url: '/favicon-32-dark.png', sizes: '32x32', type: 'image/png', media: '(prefers-color-scheme: dark)' },
-            { url: '/favicon-192-dark.png', sizes: '192x192', type: 'image/png', media: '(prefers-color-scheme: dark)' },
+            {
+                url: '/favicon-192-dark.png',
+                sizes: '192x192',
+                type: 'image/png',
+                media: '(prefers-color-scheme: dark)',
+            },
         ],
         apple: [
             // Apple touch icons for light and dark mode
-            { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png', media: '(prefers-color-scheme: light)' },
-            { url: '/apple-touch-icon-dark.png', sizes: '180x180', type: 'image/png', media: '(prefers-color-scheme: dark)' },
+            {
+                url: '/apple-touch-icon.png',
+                sizes: '180x180',
+                type: 'image/png',
+                media: '(prefers-color-scheme: light)',
+            },
+            {
+                url: '/apple-touch-icon-dark.png',
+                sizes: '180x180',
+                type: 'image/png',
+                media: '(prefers-color-scheme: dark)',
+            },
         ],
     },
     formatDetection: { telephone: false },

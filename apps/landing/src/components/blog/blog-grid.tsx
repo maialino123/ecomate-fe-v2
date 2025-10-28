@@ -10,22 +10,14 @@ interface BlogGridProps {
 export default function BlogGrid({ selectedCategory }: BlogGridProps) {
     // Filter posts by category
     const filteredPosts =
-        selectedCategory === 'all'
-            ? blogPosts
-            : blogPosts.filter((post) => post.category === selectedCategory)
+        selectedCategory === 'all' ? blogPosts : blogPosts.filter(post => post.category === selectedCategory)
 
     if (filteredPosts.length === 0) {
         return (
             <section className="relative w-full py-12">
                 <div className="max-w-7xl mx-auto px-6">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="text-center py-20"
-                    >
-                        <p className="text-white/50 text-lg">
-                            Không có bài viết nào trong danh mục này
-                        </p>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
+                        <p className="text-white/50 text-h6">Không có bài viết nào trong danh mục này</p>
                     </motion.div>
                 </div>
             </section>
@@ -37,15 +29,13 @@ export default function BlogGrid({ selectedCategory }: BlogGridProps) {
             <div className="max-w-7xl mx-auto px-6">
                 {/* Section Header */}
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                     className="mb-8"
                 >
-                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                        Tất cả bài viết
-                    </h2>
-                    <p className="text-white/60 text-sm">
+                    <h2 className="text-h5 md:text-h4 font-bold text-white mb-2">Tất cả bài viết</h2>
+                    <p className="text-white/60 text-body">
                         {filteredPosts.length} bài viết
                         {selectedCategory !== 'all' && ' trong danh mục này'}
                     </p>
@@ -72,12 +62,8 @@ export default function BlogGrid({ selectedCategory }: BlogGridProps) {
                         transition={{ duration: 0.5, delay: 0.3 }}
                         className="mt-12 text-center p-8 rounded-2xl bg-white/5 border border-white/10"
                     >
-                        <p className="text-white/60 mb-2">
-                            📝 Chúng tôi đang cập nhật thêm nhiều bài viết hữu ích...
-                        </p>
-                        <p className="text-white/40 text-sm">
-                            Hãy quay lại sau để khám phá thêm nội dung mới!
-                        </p>
+                        <p className="text-white/60 mb-2">📝 Chúng tôi đang cập nhật thêm nhiều bài viết hữu ích...</p>
+                        <p className="text-white/40 text-body">Hãy quay lại sau để khám phá thêm nội dung mới!</p>
                     </motion.div>
                 )}
             </div>

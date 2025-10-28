@@ -11,18 +11,18 @@ export default function CategoryFilter({ selectedCategory, onSelectCategory }: C
     return (
         <section className="relative w-full py-8">
             <div className="max-w-7xl mx-auto px-6">
-                <div className="flex flex-wrap gap-3 justify-center">
+                <div className="flex flex-wrap gap-4 justify-center">
                     {categories.map((category, index) => {
                         const isSelected = selectedCategory === category.id
                         return (
                             <motion.button
                                 key={category.id}
-                                initial={{ opacity: 0, y: 10 }}
+                                initial={{ opacity: 0, y: 12 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3, delay: index * 0.05 }}
                                 onClick={() => onSelectCategory(category.id)}
                                 className={`
-                                    px-5 py-2.5 rounded-full font-medium text-sm
+                                    px-6 py-3 rounded-full font-medium text-body
                                     transition-all duration-300
                                     ${
                                         isSelected
