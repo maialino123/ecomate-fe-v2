@@ -121,46 +121,49 @@ export default function ImageTourSection() {
     }, [])
 
     // Helper function để hiển thị image section cụ thể
-    const showImage = useCallback((section: TourSection) => {
-        // Ẩn tất cả trước
-        hideAllImages()
+    const showImage = useCallback(
+        (section: TourSection) => {
+            // Ẩn tất cả trước
+            hideAllImages()
 
-        // Skip if section is 'none'
-        if (section === 'none') return
+            // Skip if section is 'none'
+            if (section === 'none') return
 
-        // Hiển thị image cụ thể với zoom effect
-        let ref
-        switch (section as ImageTourSectionType) {
-            case 'living':
-                ref = livingImageRef
-                break
-            case 'kitchen':
-                ref = kitchenImageRef
-                break
-            case 'bath':
-                ref = bathImageRef
-                break
-            case 'bed':
-                ref = bedImageRef
-                break
-        }
+            // Hiển thị image cụ thể với zoom effect
+            let ref
+            switch (section as ImageTourSectionType) {
+                case 'living':
+                    ref = livingImageRef
+                    break
+                case 'kitchen':
+                    ref = kitchenImageRef
+                    break
+                case 'bath':
+                    ref = bathImageRef
+                    break
+                case 'bed':
+                    ref = bedImageRef
+                    break
+            }
 
-        if (ref.current) {
-            gsap.killTweensOf(ref.current)
-            gsap.fromTo(
-                ref.current,
-                { opacity: 0, scale: 1.08 },
-                {
-                    opacity: 1,
-                    scale: 1,
-                    duration: 0.5,
-                    ease: 'power2.out',
-                    force3D: true,
-                    immediateRender: false,
-                },
-            )
-        }
-    }, [hideAllImages])
+            if (ref.current) {
+                gsap.killTweensOf(ref.current)
+                gsap.fromTo(
+                    ref.current,
+                    { opacity: 0, scale: 1.08 },
+                    {
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.5,
+                        ease: 'power2.out',
+                        force3D: true,
+                        immediateRender: false,
+                    },
+                )
+            }
+        },
+        [hideAllImages],
+    )
 
     // Effect để đảm bảo text và image luôn ẩn khi không trong tour section
     useEffect(() => {
@@ -255,8 +258,8 @@ export default function ImageTourSection() {
                             duration: 0.5,
                             ease: 'power2.out',
                             force3D: true,
-                            immediateRender: false
-                        }
+                            immediateRender: false,
+                        },
                     ).to(circle, {
                         scale: 50,
                         opacity: 0,
@@ -345,7 +348,7 @@ export default function ImageTourSection() {
                                   duration: 0.6,
                                   ease: 'power2.inOut',
                                   force3D: true,
-                                  immediateRender: false
+                                  immediateRender: false,
                               },
                           ).to(circle, {
                               scale: 0,
@@ -445,8 +448,8 @@ export default function ImageTourSection() {
                                       duration: 0.5,
                                       ease: 'power2.out',
                                       force3D: true,
-                                      immediateRender: false
-                                  }
+                                      immediateRender: false,
+                                  },
                               )
                               .to(circle, {
                                   scale: 50,
@@ -486,7 +489,7 @@ export default function ImageTourSection() {
                                       duration: 0.6,
                                       ease: 'power2.inOut',
                                       force3D: true,
-                                      immediateRender: false
+                                      immediateRender: false,
                                   },
                               )
                               .to(circle, {
@@ -704,7 +707,7 @@ export default function ImageTourSection() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.8 }}
-                                    className="text-white/50 text-sm"
+                                    className="text-white/50 text-caption"
                                 >
                                     Scroll xuống để bắt đầu
                                 </motion.div>
@@ -748,7 +751,7 @@ export default function ImageTourSection() {
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ amount: 0.4, once: true }}
-                                className="text-3xl md:text-4xl font-semibold text-white"
+                                className="text-h4 md:text-h3 font-semibold text-white"
                             >
                                 Nhà bếp – gọn gàng & hiệu quả
                             </motion.h2>
@@ -757,7 +760,7 @@ export default function ImageTourSection() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ amount: 0.4, once: true }}
                                 transition={{ delay: 0.1 }}
-                                className="mt-3 text-white/80"
+                                className="mt-4 text-white/80"
                             >
                                 Móc dán chịu lực, kệ úp chén, bàn chải rửa cốc… mọi thứ đều trong tầm tay.
                             </motion.p>
@@ -777,7 +780,7 @@ export default function ImageTourSection() {
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ amount: 0.4, once: true }}
-                                className="text-3xl md:text-4xl font-semibold text-white"
+                                className="text-h4 md:text-h3 font-semibold text-white"
                             >
                                 Phòng tắm – sạch sẽ tiện lợi
                             </motion.h2>
@@ -786,7 +789,7 @@ export default function ImageTourSection() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ amount: 0.4, once: true }}
                                 transition={{ delay: 0.1 }}
-                                className="mt-3 text-white/80"
+                                className="mt-4 text-white/80"
                             >
                                 Giải pháp dán không khoan tường, khô nhanh, bền bỉ – an tâm sử dụng mỗi ngày.
                             </motion.p>
@@ -806,7 +809,7 @@ export default function ImageTourSection() {
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ amount: 0.4, once: true }}
-                                className="text-3xl md:text-4xl font-semibold text-white"
+                                className="text-h4 md:text-h3 font-semibold text-white"
                             >
                                 Phòng ngủ – yên tĩnh & ngăn nắp
                             </motion.h2>
@@ -815,7 +818,7 @@ export default function ImageTourSection() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ amount: 0.4, once: true }}
                                 transition={{ delay: 0.1 }}
-                                className="mt-3 text-white/80"
+                                className="mt-4 text-white/80"
                             >
                                 Hộp chứa đồ, kệ mini, đèn ngủ… giúp không gian luôn gọn gàng.
                             </motion.p>

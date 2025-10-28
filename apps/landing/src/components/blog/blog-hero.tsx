@@ -11,12 +11,10 @@ export default function BlogHero() {
                     transition={{ duration: 0.6 }}
                     className="text-center"
                 >
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-                        Blog & Hướng dẫn
-                    </h1>
-                    <p className="text-lg md:text-xl text-white/70 max-w-3xl mx-auto">
-                        Khám phá tips, tricks và hướng dẫn hữu ích về đồ gia dụng,
-                        sắp xếp không gian sống thông minh và nhiều chủ đề thú vị khác
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">Blog & Hướng dẫn</h1>
+                    <p className="text-h6 md:text-h6 text-white/70 max-w-3xl mx-auto">
+                        Khám phá tips, tricks và hướng dẫn hữu ích về đồ gia dụng, sắp xếp không gian sống thông minh và
+                        nhiều chủ đề thú vị khác
                     </p>
                 </motion.div>
             </div>

@@ -29,7 +29,7 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps) {
                     <div className="flex items-center gap-2 mb-4">
                         <div
                             className={`
-                                px-3 py-1 rounded-full text-xs font-medium
+                                px-4 py-2 rounded-full text-xs font-medium
                                 border ${colorClasses.bg} ${colorClasses.text} ${colorClasses.border}
                             `}
                         >
@@ -40,19 +40,19 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps) {
                 )}
 
                 {/* Title */}
-                <h3 className="text-xl font-semibold text-white mb-3 line-clamp-2 group-hover:text-emerald-400 transition-colors">
+                <h3 className="text-h6 font-semibold text-white mb-4 line-clamp-2 group-hover:text-emerald-400 transition-colors">
                     {post.title}
                 </h3>
 
                 {/* Excerpt */}
-                <p className="text-white/70 text-sm mb-4 line-clamp-3">{post.excerpt}</p>
+                <p className="text-white/70 text-body mb-4 line-clamp-3">{post.excerpt}</p>
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                    {post.tags.slice(0, 3).map((tag) => (
+                    {post.tags.slice(0, 3).map(tag => (
                         <span
                             key={tag}
-                            className="text-xs px-2 py-1 rounded-md bg-white/5 text-white/60 border border-white/10"
+                            className="text-xs px-4 py-2 rounded-md bg-white/5 text-white/60 border border-white/10"
                         >
                             {tag}
                         </span>
@@ -72,7 +72,7 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps) {
                 </div>
 
                 {/* CTA */}
-                <div className="flex items-center gap-2 text-emerald-400 font-medium text-sm group-hover:gap-3 transition-all">
+                <div className="flex items-center gap-2 text-emerald-400 font-medium text-body group-hover:gap-3 transition-all">
                     <span>Đọc thêm</span>
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </div>
