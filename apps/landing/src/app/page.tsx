@@ -20,16 +20,16 @@ function PageContent() {
             {/* Fixed Header */}
             <Header />
 
-            {/* Mobile Floating Dock - Chỉ hiển thị trên mobile */}
+            {/* Mobile Floating Dock */}
             <MobileDock />
 
             {/* Hero Banner - Full screen */}
             <HeroBanner />
 
-            {/* 3D Tour Section - Kích hoạt sau khi scroll qua hero */}
+            {/* 3D Tour Section */}
             <TourSection />
 
-            {/* Our Products Section - Ẩn khi đang transition */}
+            {/* Our Products Section */}
             <div style={{ opacity: isTransitioning ? 0 : 1, transition: 'opacity 0.3s' }}>
                 <OurProducts />
                 <FeaturedGuides />
