@@ -13,7 +13,7 @@ interface BlogPostLayoutProps {
 export default function BlogPostLayout({ children }: BlogPostLayoutProps) {
     return (
         <PageTransition>
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900">
+            <div className="min-h-screen">
                 {/* Header */}
                 <Header />
 

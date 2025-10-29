@@ -15,7 +15,7 @@ export default function BlogPage() {
 
     return (
         <PageTransition>
-            <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900">
+            <div className="relative min-h-screen">
                 {/* Fixed Header */}
                 <Header />
 
@@ -28,10 +28,7 @@ export default function BlogPage() {
                     <BlogHero />
 
                     {/* Category Filter */}
-                    <CategoryFilter
-                        selectedCategory={selectedCategory}
-                        onSelectCategory={setSelectedCategory}
-                    />
+                    <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
 
                     {/* Featured Posts (only show when "all" is selected) */}
                     {selectedCategory === 'all' && <FeaturedPosts />}

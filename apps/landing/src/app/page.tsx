@@ -14,9 +14,6 @@ function PageContent() {
 
     return (
         <div className="relative">
-            {/* Fixed Background */}
-            <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 -z-10" />
-
             {/* Fixed Header */}
             <Header />
 
