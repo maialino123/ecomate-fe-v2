@@ -45,7 +45,7 @@ export default function PageTransition({ children }: { children: React.ReactNode
             {showOverlay && (
                 <div
                     ref={transitionRef}
-                    className="fixed inset-0 z-[9999] bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 pointer-events-none"
+                    className="fixed inset-0 z-[9999] bg-gradient-to-br from-[#dee1e1] to-[#f4f4f4] pointer-events-none"
                     style={{ transformOrigin: 'top' }}
                 />
             )}

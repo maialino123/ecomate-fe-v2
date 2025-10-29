@@ -60,7 +60,7 @@ export default function BlogGrid({ selectedCategory }: BlogGridProps) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: 0.3 }}
-                        className="mt-12 text-center p-8 rounded-2xl bg-white/5 border border-white/10"
+                        className="mt-12 text-center p-8 rounded-2xl bg-white/5 border border-white/15"
                     >
                         <p className="text-white/60 mb-2">📝 Chúng tôi đang cập nhật thêm nhiều bài viết hữu ích...</p>
                         <p className="text-white/40 text-body">Hãy quay lại sau để khám phá thêm nội dung mới!</p>

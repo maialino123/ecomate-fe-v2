@@ -16,7 +16,7 @@ export default function Footer() {
     }
 
     return (
-        <footer className="relative w-full border-t border-white/10 py-20">
+        <footer className="relative w-full border-t border-slate-200 py-20">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                     {/* About Section */}
@@ -29,20 +29,20 @@ export default function Footer() {
                         <div className="mb-4">
                             <Image src={logo} alt="Ecomate Logo" height={40} className="h-10 w-auto" />
                         </div>
-                        <p className="text-white/70 text-body mb-6">
+                        <p className="text-slate-600 text-body mb-6">
                             Giải pháp thông minh cho không gian sống hiện đại. Sản phẩm chất lượng, giá cả hợp lý.
                         </p>
                         <div className="space-y-4">
-                            <div className="flex items-center gap-3 text-white/70 text-body">
-                                <MapPin className="h-4 w-4 text-emerald-400" />
+                            <div className="flex items-center gap-3 text-slate-600 text-body">
+                                <MapPin className="h-4 w-4 text-emerald-600" />
                                 <span>Việt Nam</span>
                             </div>
-                            <div className="flex items-center gap-3 text-white/70 text-body">
-                                <Phone className="h-4 w-4 text-emerald-400" />
+                            <div className="flex items-center gap-3 text-slate-600 text-body">
+                                <Phone className="h-4 w-4 text-emerald-600" />
                                 <span>+84 xxx xxx xxx</span>
                             </div>
-                            <div className="flex items-center gap-3 text-white/70 text-body">
-                                <Mail className="h-4 w-4 text-emerald-400" />
+                            <div className="flex items-center gap-3 text-slate-600 text-body">
+                                <Mail className="h-4 w-4 text-emerald-600" />
                                 <span>contact@ecomate.vn</span>
                             </div>
                         </div>
@@ -55,7 +55,7 @@ export default function Footer() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.5, delay: 0.1 }}
                     >
-                        <h4 className="text-h6 font-semibold text-white mb-4">Khám phá</h4>
+                        <h4 className="text-h6 font-semibold text-slate-900 mb-4">Khám phá</h4>
                         <ul className="space-y-4">
                             {[
                                 { name: 'Sản phẩm', href: '#products' },
@@ -68,7 +68,7 @@ export default function Footer() {
                                 <li key={idx}>
                                     <a
                                         href={link.href}
-                                        className="text-white/70 hover:text-emerald-400 transition-colors text-body"
+                                        className="text-slate-600 hover:text-emerald-600 transition-colors text-body"
                                     >
                                         {link.name}
                                     </a>
@@ -84,7 +84,7 @@ export default function Footer() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.5, delay: 0.2 }}
                     >
-                        <h4 className="text-h6 font-semibold text-white mb-4">Chính sách</h4>
+                        <h4 className="text-h6 font-semibold text-slate-900 mb-4">Chính sách</h4>
                         <ul className="space-y-4">
                             {[
                                 { name: 'Chính sách bảo mật', href: '/privacy-policy' },
@@ -95,7 +95,7 @@ export default function Footer() {
                                 <li key={idx}>
                                     <a
                                         href={link.href}
-                                        className="text-white/70 hover:text-emerald-400 transition-colors text-body"
+                                        className="text-slate-600 hover:text-emerald-600 transition-colors text-body"
                                     >
                                         {link.name}
                                     </a>
@@ -111,7 +111,7 @@ export default function Footer() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.5, delay: 0.3 }}
                     >
-                        <h4 className="text-h6 font-semibold text-white mb-4">Liên hệ</h4>
+                        <h4 className="text-h6 font-semibold text-slate-900 mb-4">Liên hệ</h4>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <input
@@ -119,7 +119,7 @@ export default function Footer() {
                                     placeholder="Email của bạn"
                                     value={email}
                                     onChange={e => setEmail(e.target.value)}
-                                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/50 focus:outline-none focus:border-emerald-400 transition-colors text-body"
+                                    className="w-full px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors text-body"
                                     required
                                 />
                             </div>
@@ -129,13 +129,13 @@ export default function Footer() {
                                     value={message}
                                     onChange={e => setMessage(e.target.value)}
                                     rows={3}
-                                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/50 focus:outline-none focus:border-emerald-400 transition-colors resize-none text-body"
+                                    className="w-full px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors resize-none text-body"
                                     required
                                 />
                             </div>
                             <button
                                 type="submit"
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-body font-medium"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-slate-900 rounded-lg hover:bg-emerald-700 transition-colors text-body font-medium"
                             >
                                 <Send className="h-4 w-4" />
                                 Gửi tin nhắn
@@ -150,7 +150,7 @@ export default function Footer() {
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: 0.4 }}
-                    className="pt-8 border-t border-white/10"
+                    className="pt-8 border-t border-slate-200"
                 >
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         {/* Social Icons */}
@@ -159,26 +159,26 @@ export default function Footer() {
                                 href="https://www.facebook.com/profile.php?id=61582768598900"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:border-blue-400 hover:bg-blue-400/10 transition-all group"
+                                className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-slate-200 hover:border-blue-400 hover:bg-blue-400/10 transition-all group"
                             >
-                                <Facebook className="h-5 w-5 text-white/70 group-hover:text-blue-400 transition-colors" />
+                                <Facebook className="h-5 w-5 text-slate-600 group-hover:text-blue-400 transition-colors" />
                             </a>
                             <a
                                 href="https://shopee.vn/ecomate"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:border-orange-400 hover:bg-orange-400/10 transition-all group"
+                                className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-slate-200 hover:border-orange-400 hover:bg-orange-400/10 transition-all group"
                             >
-                                <ShoppingBag className="h-5 w-5 text-white/70 group-hover:text-orange-400 transition-colors" />
+                                <ShoppingBag className="h-5 w-5 text-slate-600 group-hover:text-orange-400 transition-colors" />
                             </a>
                             <a
                                 href="https://tiktok.com/@ecomate"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:border-pink-400 hover:bg-pink-400/10 transition-all group"
+                                className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-slate-200 hover:border-pink-400 hover:bg-pink-400/10 transition-all group"
                             >
                                 <svg
-                                    className="h-5 w-5 text-white/70 group-hover:text-pink-400 transition-colors"
+                                    className="h-5 w-5 text-slate-600 group-hover:text-pink-400 transition-colors"
                                     fill="currentColor"
                                     viewBox="0 0 24 24"
                                 >
@@ -188,7 +188,7 @@ export default function Footer() {
                         </div>
 
                         {/* Copyright */}
-                        <div className="text-white/50 text-caption text-center md:text-right">
+                        <div className="text-slate-500 text-caption text-center md:text-right">
                             © {new Date().getFullYear()} Ecomate. All rights reserved.
                         </div>
                     </div>

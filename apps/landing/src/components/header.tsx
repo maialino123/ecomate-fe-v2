@@ -34,7 +34,7 @@ export default function Header() {
             animate={{ y: showHeader ? 0 : -100 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-                scrolled ? 'bg-black/80 backdrop-blur-lg border-b border-white/10' : 'bg-transparent'
+                scrolled ? 'bg-white/90 backdrop-blur-lg border-b border-slate-200 shadow-sm' : 'bg-transparent'
             }`}
         >
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -45,13 +45,13 @@ export default function Header() {
 
                 {/* Desktop Navigation */}
                 <nav className="flex items-center space-x-8">
-                    <a href="#hero" className="text-white/80 hover:text-white transition-colors">
+                    <a href="#hero" className="text-slate-700 hover:text-slate-900 transition-colors">
                         Trang chủ
                     </a>
-                    <a href="#tour" className="text-white/80 hover:text-white transition-colors">
+                    <a href="#tour" className="text-slate-700 hover:text-slate-900 transition-colors">
                         Khám phá
                     </a>
-                    <a href="#products" className="text-white/80 hover:text-white transition-colors">
+                    <a href="#products" className="text-slate-700 hover:text-slate-900 transition-colors">
                         Sản phẩm
                     </a>
                     <a
