@@ -20,8 +20,8 @@ export default function FeaturedPosts() {
                     transition={{ duration: 0.5 }}
                     className="mb-8"
                 >
-                    <h2 className="text-h5 md:text-h4 font-bold text-white mb-2">⭐ Bài viết nổi bật</h2>
-                    <p className="text-white/60 text-body">Những bài viết được quan tâm và đọc nhiều nhất</p>
+                    <h2 className="text-h5 md:text-h4 font-bold text-slate-900 mb-2">⭐ Bài viết nổi bật</h2>
+                    <p className="text-slate-900/60 text-body">Những bài viết được quan tâm và đọc nhiều nhất</p>
                 </motion.div>
 
                 {/* Featured Posts Grid */}

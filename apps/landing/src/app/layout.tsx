@@ -144,7 +144,7 @@ export default function RootLayout({
     return (
         <html lang="vi" translate="no" suppressHydrationWarning>
             <body
-                className={`${openSans.variable} font-sans antialiased bg-slate-950 text-white selection:bg-emerald-300/60`}
+                className={`${openSans.variable} font-sans antialiased bg-gradient-to-br from-[#dee1e1] to-[#f4f4f4] text-slate-900 selection:bg-emerald-200`}
                 suppressHydrationWarning
             >
                 {/* JSON‑LD for Google Ads/SEO */}

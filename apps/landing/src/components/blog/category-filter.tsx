@@ -27,7 +27,7 @@ export default function CategoryFilter({ selectedCategory, onSelectCategory }: C
                                     ${
                                         isSelected
                                             ? 'bg-emerald-600 text-white border-2 border-emerald-500 scale-105'
-                                            : 'bg-white/5 text-white/70 border-2 border-white/10 hover:border-white/30 hover:bg-white/10'
+                                            : 'bg-slate-100 text-slate-700 border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-200'
                                     }
                                 `}
                             >

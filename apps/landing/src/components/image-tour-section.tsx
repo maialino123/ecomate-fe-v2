@@ -6,6 +6,7 @@ import { useTransition } from '@/contexts/transition-context'
 import { useTourStore, type TourSection } from '@/stores/tour-store'
 import Image, { type StaticImageData } from 'next/image'
 import { useDeviceCapabilities } from '@/hooks/useDeviceCapabilities'
+import SideGlowDecorator from '@/components/decorators/side-glow'
 
 // Static imports for Next.js optimization
 import livingRoomImg from '@/../public/images/snapshot-banner/living-room.png'
@@ -633,11 +634,10 @@ function ImageTourSectionComponent() {
     }, []) // Chỉ chạy 1 lần khi mount/unmount
 
     return (
-        <section
-            id="tour"
-            ref={sectionRef}
-            className="relative min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900"
-        >
+        <section id="tour" ref={sectionRef} className="relative min-h-screen bg-slate-950">
+            {/* Background Decorators */}
+            <SideGlowDecorator side="left" color="emerald" size={70} opacity={0.06} />
+
             {/* Unified Circular Overlay - Single compositing layer */}
             {circleAnimation !== 'none' && (
                 <div
@@ -763,7 +763,7 @@ function ImageTourSectionComponent() {
                 {/* Gradient overlay */}
                 <div
                     style={{ pointerEvents: 'none' }}
-                    className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"
+                    className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"
                 />
             </div>
 
