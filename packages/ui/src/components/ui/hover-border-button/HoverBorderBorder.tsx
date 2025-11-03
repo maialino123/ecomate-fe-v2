@@ -3,14 +3,21 @@
 /**
  * Border frame component
  * Renders the actual border lines that appear on hover
+ * Uses local state for hover and shared context for styling config
+ *
+ * Can be used both inside Button/Link (interactive) or standalone (static)
  */
 
 import { cn } from '../../../lib/utils'
 import { useHoverBorder } from './context'
+import { useLocalStateOrDefault } from './LocalStateContext'
 import type { HoverBorderBorderProps } from './types'
 
 export function HoverBorderBorder(_props: HoverBorderBorderProps) {
-    const { isHovered, borderColor, borderWidth, animationDuration } = useHoverBorder()
+    // Get per-button hover state from local context (or defaults if outside Button/Link)
+    const { isHovered } = useLocalStateOrDefault()
+    // Get shared styling config from global context
+    const { borderColor, borderWidth, animationDuration } = useHoverBorder()
 
     return (
         <div

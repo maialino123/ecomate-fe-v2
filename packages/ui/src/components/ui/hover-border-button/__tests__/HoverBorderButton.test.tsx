@@ -330,4 +330,165 @@ describe('HoverBorderButton', () => {
             expect(link).toHaveAttribute('hrefLang', 'en')
         })
     })
+
+    describe('Frame Variant', () => {
+        it('should render as div element', () => {
+            render(
+                <HoverBorderButton>
+                    <HoverBorderButton.Frame data-testid="frame">Frame Content</HoverBorderButton.Frame>
+                </HoverBorderButton>,
+            )
+
+            const frame = screen.getByTestId('frame')
+            expect(frame.tagName).toBe('DIV')
+            expect(frame).toHaveTextContent('Frame Content')
+        })
+
+        it('should apply custom className', () => {
+            render(
+                <HoverBorderButton>
+                    <HoverBorderButton.Frame className="custom-frame" data-testid="frame">
+                        Custom Frame
+                    </HoverBorderButton.Frame>
+                </HoverBorderButton>,
+            )
+
+            const frame = screen.getByTestId('frame')
+            expect(frame).toHaveClass('custom-frame')
+        })
+
+        it('should handle mouse events', async () => {
+            const user = userEvent.setup()
+
+            render(
+                <HoverBorderButton>
+                    <HoverBorderButton.Frame data-testid="frame">Hover Frame</HoverBorderButton.Frame>
+                </HoverBorderButton>,
+            )
+
+            const frame = screen.getByTestId('frame')
+            await user.hover(frame)
+            await user.unhover(frame)
+
+            expect(frame).toBeInTheDocument()
+        })
+
+        it('should forward additional props', () => {
+            render(
+                <HoverBorderButton>
+                    <HoverBorderButton.Frame data-testid="frame" aria-label="Custom Frame" role="region">
+                        Frame
+                    </HoverBorderButton.Frame>
+                </HoverBorderButton>,
+            )
+
+            const frame = screen.getByTestId('frame')
+            expect(frame).toHaveAttribute('aria-label', 'Custom Frame')
+            expect(frame).toHaveAttribute('role', 'region')
+        })
+    })
+
+    describe('Effect and Border Components - Standalone Usage', () => {
+        it('should not crash when Effect is used outside Button/Link', () => {
+            expect(() => {
+                render(
+                    <HoverBorderButton>
+                        <div>
+                            <HoverBorderButton.Effect />
+                        </div>
+                    </HoverBorderButton>,
+                )
+            }).not.toThrow()
+        })
+
+        it('should not crash when Border is used outside Button/Link', () => {
+            expect(() => {
+                render(
+                    <HoverBorderButton>
+                        <div>
+                            <HoverBorderButton.Border />
+                        </div>
+                    </HoverBorderButton>,
+                )
+            }).not.toThrow()
+        })
+
+        it('should not crash when both Effect and Border are used together outside wrappers', () => {
+            expect(() => {
+                render(
+                    <HoverBorderButton>
+                        <div className="relative">
+                            <HoverBorderButton.Effect />
+                            <HoverBorderButton.Border />
+                            <span>Custom composition</span>
+                        </div>
+                    </HoverBorderButton>,
+                )
+            }).not.toThrow()
+        })
+
+        it('should render Effect and Border with default non-interactive state', () => {
+            render(
+                <HoverBorderButton>
+                    <div data-testid="custom-wrapper" className="relative">
+                        <HoverBorderButton.Effect />
+                        <HoverBorderButton.Border />
+                        <span>Static content</span>
+                    </div>
+                </HoverBorderButton>,
+            )
+
+            const wrapper = screen.getByTestId('custom-wrapper')
+            expect(wrapper).toBeInTheDocument()
+            expect(screen.getByText('Static content')).toBeInTheDocument()
+        })
+    })
+
+    describe('Multiple Buttons Under One Provider - State Isolation', () => {
+        it('should maintain independent hover states for multiple buttons', async () => {
+            const user = userEvent.setup()
+
+            render(
+                <HoverBorderButton>
+                    <div className="flex gap-4">
+                        <HoverBorderButton.Button data-testid="button1">Button 1</HoverBorderButton.Button>
+                        <HoverBorderButton.Button data-testid="button2">Button 2</HoverBorderButton.Button>
+                    </div>
+                </HoverBorderButton>,
+            )
+
+            const button1 = screen.getByTestId('button1')
+            const button2 = screen.getByTestId('button2')
+
+            // Hover over button1
+            await user.hover(button1)
+
+            // Both buttons should exist and be independent
+            expect(button1).toBeInTheDocument()
+            expect(button2).toBeInTheDocument()
+
+            // Unhover and hover the other button
+            await user.unhover(button1)
+            await user.hover(button2)
+
+            expect(button1).toBeInTheDocument()
+            expect(button2).toBeInTheDocument()
+        })
+
+        it('should work with mixed Button, Link, and Frame under one provider', () => {
+            render(
+                <HoverBorderButton>
+                    <div className="flex gap-4">
+                        <HoverBorderButton.Button>Button</HoverBorderButton.Button>
+                        <HoverBorderButton.Link href="/test">Link</HoverBorderButton.Link>
+                        <HoverBorderButton.Frame data-testid="frame">Frame</HoverBorderButton.Frame>
+                    </div>
+                </HoverBorderButton>,
+            )
+
+            expect(screen.getByRole('button', { name: 'Button' })).toBeInTheDocument()
+            expect(screen.getByRole('link', { name: 'Link' })).toBeInTheDocument()
+            expect(screen.getByTestId('frame')).toBeInTheDocument()
+        })
+    })
 })

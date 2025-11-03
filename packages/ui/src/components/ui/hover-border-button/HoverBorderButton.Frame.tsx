@@ -1,9 +1,11 @@
 'use client'
 
 /**
- * Button variant for HoverBorderButton
- * Renders as a <button> element with hover effects
- * Each button instance manages its own hover state to prevent interference
+ * Frame variant for HoverBorderButton
+ * Renders as a <div> element with hover effects
+ * Each frame instance manages its own hover state to prevent interference
+ *
+ * Use this for custom interactive elements that aren't buttons or links
  */
 
 import { cn } from '../../../lib/utils'
@@ -11,34 +13,29 @@ import { HoverBorderEffect } from './HoverBorderEffect'
 import { HoverBorderBorder } from './HoverBorderBorder'
 import { LocalStateProvider } from './LocalStateContext'
 import { useLocalButtonState } from './useLocalButtonState'
-import type { HoverBorderButtonButtonProps } from './types'
+import type { HoverBorderFrameProps } from './types'
 
-export function HoverBorderButtonButton({ children, className, disabled, ...props }: HoverBorderButtonButtonProps) {
-    // Each button manages its own state
+export function HoverBorderButtonFrame({ children, className, ...props }: HoverBorderFrameProps) {
+    // Each frame manages its own state
     const localState = useLocalButtonState()
     const { elementRef, handleMouseMove, handleMouseEnter, handleMouseLeave } = localState
 
     return (
         <LocalStateProvider value={localState}>
-            <button
-                ref={elementRef as React.RefObject<HTMLButtonElement>}
+            <div
+                ref={elementRef as React.RefObject<HTMLDivElement>}
                 onMouseMove={handleMouseMove}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
-                className={cn(
-                    'relative overflow-hidden transition-all isolate',
-                    disabled && 'opacity-50 cursor-not-allowed pointer-events-none',
-                    className,
-                )}
-                disabled={disabled}
+                className={cn('relative overflow-hidden transition-all isolate', className)}
                 {...props}
             >
                 <HoverBorderEffect />
                 <HoverBorderBorder />
                 <span className="relative z-[3]">{children}</span>
-            </button>
+            </div>
         </LocalStateProvider>
     )
 }
 
-HoverBorderButtonButton.displayName = 'HoverBorderButton.Button'
+HoverBorderButtonFrame.displayName = 'HoverBorderButton.Frame'

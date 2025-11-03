@@ -6,12 +6,9 @@ import type { ComponentPropsWithoutRef, PropsWithChildren } from 'react'
 
 /**
  * Context value shared across all HoverBorderButton subcomponents
+ * Now only contains shared configuration, not per-button state
  */
 export interface HoverBorderContextValue {
-    /** Current mouse position as percentage (0-100) */
-    mousePosition: { x: number; y: number }
-    /** Whether the button is currently hovered */
-    isHovered: boolean
     /** Border color (rgba, hex, etc.) */
     borderColor: string
     /** Border width in CSS units */
@@ -20,6 +17,17 @@ export interface HoverBorderContextValue {
     glowIntensity: number
     /** Animation duration in seconds */
     animationDuration: number
+}
+
+/**
+ * Local state for individual button instances
+ * Used internally by Button/Link components
+ */
+export interface HoverBorderLocalState {
+    /** Current mouse position as percentage (0-100) */
+    mousePosition: { x: number; y: number }
+    /** Whether the button is currently hovered */
+    isHovered: boolean
     /** Ref to the button/link element for position calculations */
     elementRef: React.RefObject<HTMLElement | null>
     /** Mouse event handlers */

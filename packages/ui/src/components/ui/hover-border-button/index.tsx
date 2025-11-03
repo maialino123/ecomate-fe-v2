@@ -22,6 +22,13 @@
  *   </HoverBorderButton.Link>
  * </HoverBorderButton>
  *
+ * // Frame variant (for custom div wrappers)
+ * <HoverBorderButton>
+ *   <HoverBorderButton.Frame className="px-8 py-4">
+ *     Custom interactive div
+ *   </HoverBorderButton.Frame>
+ * </HoverBorderButton>
+ *
  * // Old API (deprecated but supported for backward compatibility)
  * <HoverBorderButtonLegacy
  *   onClick={handleClick}
@@ -35,6 +42,7 @@
 import { HoverBorderButton as Root } from './HoverBorderButton'
 import { HoverBorderButtonButton } from './HoverBorderButton.Button'
 import { HoverBorderButtonLink } from './HoverBorderButton.Link'
+import { HoverBorderButtonFrame } from './HoverBorderButton.Frame'
 import { HoverBorderEffect } from './HoverBorderEffect'
 import { HoverBorderBorder } from './HoverBorderBorder'
 import { useHoverBorder } from './context'
@@ -43,19 +51,26 @@ import { useHoverBorder } from './context'
 export const HoverBorderButton = Object.assign(Root, {
     Button: HoverBorderButtonButton,
     Link: HoverBorderButtonLink,
+    Frame: HoverBorderButtonFrame,
     Effect: HoverBorderEffect,
     Border: HoverBorderBorder,
 })
 
-// Export hook for custom components
+// Export hooks for custom components
 export { useHoverBorder }
+
+// Export local state hooks for advanced custom compositions
+export { useOptionalLocalState, useLocalStateOrDefault, LocalStateProvider } from './LocalStateContext'
+export { useLocalButtonState } from './useLocalButtonState'
 
 // Export types
 export type {
     HoverBorderButtonProps,
     HoverBorderButtonButtonProps,
     HoverBorderButtonLinkProps,
+    HoverBorderFrameProps,
     HoverBorderContextValue,
+    HoverBorderLocalState,
 } from './types'
 
 // Backward compatibility: Legacy component that mimics old API
