@@ -15,7 +15,7 @@ import '@/styles/tour-section.css'
 
 export default function TourSection() {
     return (
-        <section className="relative py-10 md:py-16">
+        <section id="tour" className="relative py-10 md:py-16">
             {/* Section Header */}
             <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 mb-12 text-center">
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
