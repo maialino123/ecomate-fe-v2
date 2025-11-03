@@ -19,7 +19,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ecomate-fe-v2-land
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'Ecomate'
 
 export const viewport = {
-    themeColor: '#10b981', // Emerald color matching your brand
+    themeColor: '#10b981',
 }
 
 export const metadata: Metadata = {
@@ -156,7 +156,6 @@ export default function RootLayout({
                 <SeoJsonLd data={orgJsonLd} />
                 <SeoJsonLd data={webSiteJsonLd} />
                 <Providers>{children}</Providers>
-                <TwentyFirstToolbar config={{ plugins: [ReactPlugin] }} />
             </body>
         </html>
     )
