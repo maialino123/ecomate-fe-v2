@@ -9,7 +9,10 @@
         "start": "next start --port 3002",
         "lint": "next lint",
         "lint:fix": "next lint --fix",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "optimize:images": "tsx scripts/optimize-images.ts",
+        "generate:upload": "tsx scripts/generate-upload-commands.ts",
+        "upload:r2": "bash scripts/r2-upload-commands.sh"
     },
     "dependencies": {
         "@tabler/icons-react": "^3.35.0",
@@ -42,6 +45,7 @@
         "@workspace/typescript-config": "workspace:*",
         "eslint": "^9.35.0",
         "sharp": "^0.34.4",
+        "tsx": "^4.20.6",
         "typescript": "^5.9.2"
     }
 }

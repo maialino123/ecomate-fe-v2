@@ -1,11 +1,19 @@
 import Image from 'next/image'
 import { TourSection } from '@/data/tour-data'
 import { cn } from '@workspace/ui/lib/utils'
+import { getOptimizedImageUrl, getImageSrcSet, IMAGE_CONFIGS, getImageQuality } from '@/lib/image-utils'
 
-interface TourCardProps extends TourSection {}
+interface TourCardProps extends TourSection {
+    isFirstCard?: boolean // Flag to identify first card for priority loading
+}
 
-export default function TourCard({ title, description, image, imagePosition, cta }: TourCardProps) {
+export default function TourCard({ title, description, image, imagePosition, cta, isFirstCard = false }: TourCardProps) {
     const isImageRight = imagePosition === 'right'
+
+    // Get responsive image URLs from CDN
+    const imageSrc = getOptimizedImageUrl(image, 1024)
+    const imageSrcSet = getImageSrcSet(image)
+    const imageQuality = getImageQuality('tourCard')
 
     return (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -80,13 +88,16 @@ export default function TourCard({ title, description, image, imagePosition, cta
                     >
                         <div className="relative w-full h-full">
                             <Image
-                                src={image}
+                                src={imageSrc}
                                 alt={title}
                                 fill
                                 className="object-cover"
-                                sizes="(max-width: 768px) 100vw, 40vw"
-                                quality={90}
-                                priority
+                                sizes={IMAGE_CONFIGS.tourCard.sizes}
+                                quality={imageQuality}
+                                priority={isFirstCard} // Only first card gets priority
+                                loading={isFirstCard ? 'eager' : 'lazy'} // Lazy load for cards 2-4
+                                placeholder="blur"
+                                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
                             />
                             {/* Gradient overlay for better text readability on mobile */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent md:hidden" />

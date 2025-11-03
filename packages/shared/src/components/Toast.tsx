@@ -54,13 +54,6 @@ export function Toast() {
                     onClose={() => removeNotification(notification.id)}
                 />
             ))}
-
-            {/* Debug indicator */}
-            {process.env.NODE_ENV === 'development' && (
-                <div className="text-xs text-gray-500 mt-2 pointer-events-auto">
-                    Toast mounted ({notifications.length} notifications)
-                </div>
-            )}
         </div>
     )
 }

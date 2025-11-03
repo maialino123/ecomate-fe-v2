@@ -39,8 +39,10 @@
 
 /* Performance optimizations */
 .tour-scroll-stack .scroll-stack-card {
+    /* Use contain for better performance, but remove content-visibility
+       which can cause layout thrashing during scroll */
     contain: layout style;
-    content-visibility: auto;
+    /* Removed: content-visibility: auto; - causes performance issues on scroll */
 }
 
 /* Smooth transitions for transforms */
