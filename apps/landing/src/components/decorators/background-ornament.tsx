@@ -2,70 +2,112 @@
 import Image from 'next/image'
 import { cn } from '@workspace/ui/lib/utils'
 
+/**
+ * Visual variants for BackgroundOrnament positioning and sizing
+ */
+type OrnamentVariant = 'full-width' | 'peek-left' | 'peek-right'
+
+/**
+ * Available ornament images
+ */
+type OrnamentImage = 'journey' | 'usp'
+
 interface BackgroundOrnamentProps {
     /**
-     * Which ornament image to use
+     * Visual variant controlling position and sizing behavior
+     *
+     * - `full-width`: Covers entire container (hero sections)
+     * - `peek-left`: Positioned on left side with centered vertical alignment
+     * - `peek-right`: Positioned on right side with centered vertical alignment
      */
-    image: 'journey' | 'usp'
+    variant: OrnamentVariant
     /**
-     * Which side to position the ornament
+     * Which ornament image to display
      */
-    side: 'left' | 'right'
+    image: OrnamentImage
     /**
-     * Opacity of the ornament (default: 0.06)
+     * Opacity override (defaults: 1 for full-width, 0.06 for peek variants)
      */
     opacity?: number
     /**
-     * Vertical position adjustment (default: 'center')
-     */
-    verticalAlign?: 'top' | 'center' | 'bottom'
-    /**
-     * Additional className
+     * Additional className for fine-tuning (z-index, etc.)
      */
     className?: string
 }
 
-const imagePaths = {
+const imagePaths: Record<OrnamentImage, string> = {
     journey: '/images/background/journey-ornament.webp',
     usp: '/images/background/usp-ornament.webp',
 }
 
-const sidePositions = {
-    left: 'left-0 -translate-x-1/2',
-    right: 'right-0 translate-x-1/2',
+/**
+ * Variant configuration using object mapping pattern
+ * Following COMPOSITION_PATTERNS.md guidelines
+ */
+const variantStyles: Record<
+    OrnamentVariant,
+    {
+        positioning: string
+        size: string
+        opacity: number
+    }
+> = {
+    'full-width': {
+        positioning: 'inset-0',
+        size: 'w-full h-full',
+        opacity: 1,
+    },
+    'peek-left': {
+        positioning: 'left-0 top-1/2 -translate-y-1/2',
+        size: 'w-full h-screen max-h-screen',
+        opacity: 0.06,
+    },
+    'peek-right': {
+        positioning: 'right-0 top-1/2 -translate-y-1/2',
+        size: 'w-full h-screen max-h-screen',
+        opacity: 0.06,
+    },
 }
 
-const verticalPositions = {
-    top: 'top-20',
-    center: 'top-1/2 -translate-y-1/2',
-    bottom: 'bottom-20',
-}
+/**
+ * BackgroundOrnament - Decorative background images
+ *
+ * @example Full-width hero decoration
+ * ```tsx
+ * <BackgroundOrnament variant="full-width" image="journey" className="z-0" />
+ * ```
+ *
+ * @example Peeking side decorations
+ * ```tsx
+ * <BackgroundOrnament variant="peek-left" image="journey" />
+ * <BackgroundOrnament variant="peek-right" image="usp" />
+ * ```
+ */
+export default function BackgroundOrnament({ variant, image, opacity, className }: BackgroundOrnamentProps) {
+    const config = variantStyles[variant]
+    const finalOpacity = opacity ?? config.opacity
 
-export default function BackgroundOrnament({
-    image,
-    side,
-    opacity = 0.06,
-    verticalAlign = 'center',
-    className,
-}: BackgroundOrnamentProps) {
     return (
         <div
             className={cn(
+                // Base styles
                 'absolute pointer-events-none',
-                'hidden xl:block', // Hide on mobile/tablet, show on xl screens (1280px+)
-                sidePositions[side],
-                verticalPositions[verticalAlign],
+                'hidden md:block',
+
+                // Variant-specific styles
+                config.positioning,
+                config.size,
+
+                // User overrides
                 className,
             )}
-            style={{
-                opacity,
-                width: '600px',
-                height: '600px',
-                maxWidth: '40vw',
-                maxHeight: '40vw',
-            }}
+            style={{ opacity: finalOpacity }}
+            aria-hidden="true"
         >
-            <Image src={imagePaths[image]} alt="" fill className="object-contain" priority={false} quality={90} />
+            <Image src={imagePaths[image]} alt="" fill className="object-contain" quality={100} priority />
         </div>
     )
 }
+
+// Export types for consumers
+export type { OrnamentVariant, OrnamentImage, BackgroundOrnamentProps }

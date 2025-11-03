@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { HoverBorderButton } from '@workspace/ui/components/ui/hover-border-button'
 import logo from '@/../public/images/logo.png'
 
 export default function Header() {
@@ -54,14 +55,16 @@ export default function Header() {
                     <a href="#products" className="text-slate-700 hover:text-slate-900 transition-colors">
                         Sản phẩm
                     </a>
-                    <a
-                        href="https://shopee.vn/ecomate"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                    >
-                        Mua ngay
-                    </a>
+                    <HoverBorderButton borderColor="rgba(16, 185, 129, 0.8)" glowIntensity={0.7}>
+                        <HoverBorderButton.Link
+                            href="https://shopee.vn/ecomate"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                        >
+                            Mua ngay
+                        </HoverBorderButton.Link>
+                    </HoverBorderButton>
                 </nav>
             </div>
         </motion.header>

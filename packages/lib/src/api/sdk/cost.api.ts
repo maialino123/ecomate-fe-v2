@@ -8,7 +8,10 @@ import {
     QueryCostCalculationDto,
     PaginatedCostCalculationsResponse,
 } from './cost.types'
-import { MessageResponse } from './auth.types'
+
+// Unused import for future feature
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { MessageResponse } from './auth.types'
 
 export class CostApi {
     constructor(private readonly client: AxiosInstance) {}

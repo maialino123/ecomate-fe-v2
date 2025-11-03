@@ -23,7 +23,7 @@ function PageContent() {
             {/* Hero Banner - Full screen */}
             <HeroBanner />
 
-            {/* 3D Tour Section */}
+            {/* Tour Section with ScrollStack */}
             <TourSection />
 
             {/* Our Products Section */}

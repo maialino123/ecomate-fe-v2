@@ -6,12 +6,11 @@ import BackgroundOrnament from '@/components/decorators/background-ornament'
 
 export default function OurProducts() {
     return (
-        <section className="relative min-h-screen py-20 px-6" style={{ marginTop: '30vh' }}>
-            {/* Background Ornaments - Outside max-width */}
-            <BackgroundOrnament image="journey" side="left" opacity={0.06} verticalAlign="top" />
-            <BackgroundOrnament image="usp" side="right" opacity={0.06} verticalAlign="bottom" />
-
+        <section className="relative min-h-screen w-full py-20 px-6">
             <div className="max-w-7xl mx-auto">
+                {/* Background Ornaments - Outside max-width */}
+                <BackgroundOrnament variant="full-width" image="journey" />
+
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
