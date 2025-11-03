@@ -39,7 +39,7 @@ export default function HeroBanner() {
             id="hero"
             ref={heroRef}
             style={{ scale, opacity, borderRadius }}
-            className={cn('relative h-screen', 'flex items-center justify-center')}
+            className={cn('relative h-screen', 'flex items-center justify-center overflow-hidden', 'bg-white')}
         >
             {/* Gradient Decorators - Deferred for performance */}
             {showDecorators && (
