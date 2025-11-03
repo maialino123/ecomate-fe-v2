@@ -1,5 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { ApproveFromEmailDto, ApprovalResponse } from '../../api'
+
+// Unused import for future feature
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { UseMutationOptions } from '@tanstack/react-query'
 
 interface UseApproveFromEmailParams {
     api: {

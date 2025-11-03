@@ -14,7 +14,8 @@ interface UseRegisterOptions {
 }
 
 export function useRegister({ api, onSuccess, onError }: UseRegisterOptions) {
-    const { success, error: showError } = useNotificationStore()
+    // Reserved for future error handling
+    const { success, error: _showError } = useNotificationStore()
 
     return useMutation({
         mutationFn: (dto: RegisterDto) => api.auth.register(dto),

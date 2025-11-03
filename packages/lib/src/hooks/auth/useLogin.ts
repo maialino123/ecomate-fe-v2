@@ -16,7 +16,8 @@ interface UseLoginOptions {
 
 export function useLogin({ api, onSuccess, onError }: UseLoginOptions) {
     const { setUser, setTokens } = useAuthStore()
-    const { error: showError } = useNotificationStore()
+    // Reserved for future error handling
+    const { error: _showError } = useNotificationStore()
 
     return useMutation({
         mutationFn: (dto: SignInDto) => api.auth.signIn(dto),
