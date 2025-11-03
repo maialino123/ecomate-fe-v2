@@ -4,16 +4,18 @@
  * Gradient overlay effect component
  * Renders the radial gradient that follows the mouse
  * Uses local state for position/hover and shared context for styling config
+ *
+ * Can be used both inside Button/Link (interactive) or standalone (static)
  */
 
 import { motion } from 'framer-motion'
 import { useHoverBorder } from './context'
-import { useLocalState } from './LocalStateContext'
+import { useLocalStateOrDefault } from './LocalStateContext'
 import type { HoverBorderEffectProps } from './types'
 
 export function HoverBorderEffect(_props: HoverBorderEffectProps) {
-    // Get per-button state from local context
-    const { mousePosition, isHovered } = useLocalState()
+    // Get per-button state from local context (or defaults if outside Button/Link)
+    const { mousePosition, isHovered } = useLocalStateOrDefault()
     // Get shared styling config from global context
     const { borderColor, glowIntensity, animationDuration } = useHoverBorder()
 
