@@ -17,3 +17,7 @@ export * from './components/permissions'
 export * from './types/product-1688'
 export * from './types/product1688.types'
 export * from './normalizers/normalize-1688'
+
+// Composition Pattern Utilities
+export * from './types/composition'
+export * from './utils/component-factory'

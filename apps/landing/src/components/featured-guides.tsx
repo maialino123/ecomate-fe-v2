@@ -31,9 +31,6 @@ export default function FeaturedGuides() {
     return (
         <section className="relative w-full py-20">
             {/* Background Ornaments */}
-            <BackgroundOrnament image="usp" side="left" opacity={0.06} verticalAlign="center" />
-            <BackgroundOrnament image="journey" side="right" opacity={0.06} verticalAlign="center" />
-
             <div className="max-w-7xl mx-auto px-6">
                 {/* Section Header */}
                 <motion.div

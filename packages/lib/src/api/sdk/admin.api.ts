@@ -4,7 +4,6 @@ import {
     SingleRegistrationRequestResponse,
     ApproveRegistrationDto,
     RejectRegistrationDto,
-    ExportFormat,
     ImportUsersDto,
     ImportUsersResponse,
     UsersResponse,
@@ -13,6 +12,10 @@ import {
     UpdateUserStatusDto,
 } from './admin.types'
 import { MessageResponse } from './auth.types'
+
+// Unused import for future export feature
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { ExportFormat } from './admin.types'
 
 export class AdminApi {
     constructor(private readonly client: AxiosInstance) {}
