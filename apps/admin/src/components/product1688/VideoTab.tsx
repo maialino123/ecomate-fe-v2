@@ -3,11 +3,17 @@
 import { useState, useEffect } from 'react'
 import { useApi } from '@workspace/shared/providers'
 import { Product1688Entity } from '@workspace/lib'
-import { useVideoDubbingProcess, useVideoDubbingStatus, useVideoDubbingRegenerate } from '@workspace/lib'
+import {
+    useVideoDubbingProcess,
+    useVideoDubbingStatus,
+    useVideoDubbingRegenerate,
+    useVideoDubbingDelete,
+} from '@workspace/lib'
 import { Button } from '@workspace/ui/components/Button'
 import { Progress } from '@workspace/ui/components/Progress'
 import { Badge } from '@workspace/ui/components/Badge'
-import { Video, Play, Download, RefreshCw, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { downloadVideoWithFallback } from '@workspace/ui/lib/file'
+import { Video, Play, Download, RefreshCw, Loader2, AlertCircle, CheckCircle2, X } from 'lucide-react'
 
 interface VideoTabProps {
     product: Product1688Entity
@@ -20,6 +26,7 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
         'vi-female-1',
     )
     const [selectedQuality, setSelectedQuality] = useState<'480p' | '720p' | '1080p'>('720p')
+    const [isDownloadingOriginal, setIsDownloadingOriginal] = useState(false)
 
     // Hooks for mutations
     const processMutation = useVideoDubbingProcess({
@@ -30,6 +37,13 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
     })
 
     const regenerateMutation = useVideoDubbingRegenerate({
+        api,
+        onSuccess: () => {
+            onRefetch?.()
+        },
+    })
+
+    const deleteMutation = useVideoDubbingDelete({
         api,
         onSuccess: () => {
             onRefetch?.()
@@ -72,6 +86,26 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
         })
     }
 
+    const handleCancel = () => {
+        if (confirm('Bạn có chắc muốn hủy xử lý video này? Hành động này không thể hoàn tác.')) {
+            deleteMutation.mutate(product.id)
+        }
+    }
+
+    const handleDownloadOriginalVideo = async () => {
+        if (!product.originalVideoUrl) return
+
+        try {
+            setIsDownloadingOriginal(true)
+            await downloadVideoWithFallback(product.originalVideoUrl, `1688-original-${product.id}.mp4`)
+        } catch (error) {
+            console.error('Download failed:', error)
+            // Error already handled by utility (fallback to window.open)
+        } finally {
+            setIsDownloadingOriginal(false)
+        }
+    }
+
     const getStatusBadge = () => {
         if (!statusData) return null
 
@@ -98,6 +132,8 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
                 )
             case 'FAILED':
                 return <Badge variant="destructive">Thất bại</Badge>
+            case 'CANCELLED':
+                return <Badge variant="secondary">Đã hủy</Badge>
             default:
                 return null
         }
@@ -118,6 +154,26 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
                         className="w-full max-w-2xl rounded-lg"
                         controlsList="nodownload"
                     />
+                    <div className="mt-4 flex gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleDownloadOriginalVideo}
+                            isDisabled={isDownloadingOriginal}
+                        >
+                            {isDownloadingOriginal ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Đang tải...
+                                </>
+                            ) : (
+                                <>
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Tải xuống video gốc
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 </div>
             )}
 
@@ -159,6 +215,27 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
                         {statusData.retryCount > 0 && (
                             <p className="text-sm text-amber-600">Số lần thử lại: {statusData.retryCount}</p>
                         )}
+
+                        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleCancel}
+                                isDisabled={deleteMutation.isPending}
+                            >
+                                {deleteMutation.isPending ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        Đang hủy...
+                                    </>
+                                ) : (
+                                    <>
+                                        <X className="w-4 h-4 mr-2" />
+                                        Hủy xử lý
+                                    </>
+                                )}
+                            </Button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -179,6 +256,23 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
                                     trợ.
                                 </p>
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Cancelled Status */}
+            {product.videoStatus === 'CANCELLED' && (
+                <div className="bg-gray-50 dark:bg-gray-900/20 rounded-lg shadow p-6">
+                    <div className="flex items-start gap-3">
+                        <X className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                                Đã hủy xử lý
+                            </h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                Bạn đã hủy xử lý video này. Bạn có thể bắt đầu lại bất cứ lúc nào.
+                            </p>
                         </div>
                     </div>
                 </div>
