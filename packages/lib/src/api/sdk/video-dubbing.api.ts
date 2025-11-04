@@ -13,19 +13,27 @@ export interface VideoProcessingOptions {
 }
 
 /**
- * Video Status Response
+ * Job Status Type
+ */
+export type JobStatus =
+    | 'QUEUED'
+    | 'DOWNLOADING'
+    | 'EXTRACTING_AUDIO'
+    | 'SEPARATING_AUDIO'
+    | 'TRANSCRIBING'
+    | 'TRANSLATING'
+    | 'GENERATING_VOICE'
+    | 'MIXING_AUDIO'
+    | 'ENCODING_VIDEO'
+    | 'UPLOADING'
+    | 'COMPLETED'
+    | 'FAILED'
+
+/**
+ * Video Status Response (Full)
  */
 export interface VideoStatusResponse {
-    status:
-        | 'QUEUED'
-        | 'DOWNLOADING'
-        | 'TRANSCRIBING'
-        | 'TRANSLATING'
-        | 'GENERATING_TTS'
-        | 'ENCODING_VIDEO'
-        | 'UPLOADING'
-        | 'COMPLETED'
-        | 'FAILED'
+    status: JobStatus
     progress: number
     currentStep: string
     startedAt?: string
@@ -36,6 +44,19 @@ export interface VideoStatusResponse {
     subtitlesUrl?: string
     errorMessage?: string
     retryCount: number
+}
+
+/**
+ * Lightweight Status Response (Optimized for Polling)
+ * Smaller payload size, used for frequent status checks
+ */
+export interface LightweightStatusResponse {
+    status: JobStatus
+    progress: number
+    currentStep: string
+    dubbedVideoUrl?: string
+    errorMessage?: string
+    updatedAt: string
 }
 
 /**
@@ -99,10 +120,21 @@ export class VideoDubbingApi {
     }
 
     /**
-     * Get processing status
+     * Get processing status (full details)
      */
     async getStatus(product1688Id: string): Promise<VideoStatusResponse> {
         const response = await this.client.get<VideoStatusResponse>(`/v1/video-dubbing/status/${product1688Id}`)
+        return response.data
+    }
+
+    /**
+     * Get lightweight processing status (optimized for polling)
+     * Use this for frequent status checks instead of getStatus()
+     */
+    async getLightweightStatus(product1688Id: string): Promise<LightweightStatusResponse> {
+        const response = await this.client.get<LightweightStatusResponse>(
+            `/v1/video-dubbing/status/${product1688Id}/quick`,
+        )
         return response.data
     }
 
