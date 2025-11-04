@@ -71,9 +71,7 @@ ${colors.reset}`)
     try {
         // Read optimized images directory
         const files = await readdir(INPUT_DIR)
-        const imageFiles = files.filter(file =>
-            /\.(webp|png|jpg|jpeg)$/i.test(file)
-        )
+        const imageFiles = files.filter(file => /\.(webp|png|jpg|jpeg)$/i.test(file))
 
         if (imageFiles.length === 0) {
             console.log(`${colors.yellow}⚠ No image files found in ${INPUT_DIR}${colors.reset}`)
@@ -84,13 +82,16 @@ ${colors.reset}`)
         console.log(`${colors.cyan}Found ${imageFiles.length} image files${colors.reset}\n`)
 
         // Group files by base name for better organization
-        const filesByImage = imageFiles.reduce((acc, file) => {
-            const baseName = file.split('-')[0] + (file.split('-')[1] || '')
-            const key = baseName.replace(/-(320w|640w|1024w|1920w|thumb).*$/, '')
-            if (!acc[key]) acc[key] = []
-            acc[key].push(file)
-            return acc
-        }, {} as Record<string, string[]>)
+        const filesByImage = imageFiles.reduce(
+            (acc, file) => {
+                const baseName = file.split('-')[0] + (file.split('-')[1] || '')
+                const key = baseName.replace(/-(320w|640w|1024w|1920w|thumb).*$/, '')
+                if (!acc[key]) acc[key] = []
+                acc[key].push(file)
+                return acc
+            },
+            {} as Record<string, string[]>,
+        )
 
         // Generate bash script
         let scriptContent = `#!/bin/bash
@@ -257,8 +258,9 @@ pause
 `
 
         await writeFile(batchScript, batchContent)
-        console.log(`${colors.green}✓${colors.reset} Also generated Windows batch file: ${colors.cyan}${batchScript}${colors.reset}\n`)
-
+        console.log(
+            `${colors.green}✓${colors.reset} Also generated Windows batch file: ${colors.cyan}${batchScript}${colors.reset}\n`,
+        )
     } catch (error) {
         console.error(`${colors.bright}${colors.yellow}Error:${colors.reset}`, error)
         process.exit(1)

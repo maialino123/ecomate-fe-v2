@@ -9,7 +9,10 @@ export const ScrollStackItem = ({ children, itemClassName = '' }) => (
 // Mobile detection utility
 const isMobileDevice = () => {
     if (typeof window === 'undefined') return false
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768
+    return (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth < 768
+    )
 }
 
 const ScrollStack = ({
@@ -303,7 +306,7 @@ const ScrollStack = ({
                     window.removeEventListener('scroll', resumeRAF)
                     window.removeEventListener('wheel', resumeRAF)
                     window.removeEventListener('touchmove', resumeRAF)
-                }
+                },
             }
         } else {
             const scroller = scrollerRef.current
@@ -360,7 +363,7 @@ const ScrollStack = ({
                     scroller.removeEventListener('scroll', resumeRAF)
                     scroller.removeEventListener('wheel', resumeRAF)
                     scroller.removeEventListener('touchmove', resumeRAF)
-                }
+                },
             }
         }
     }, [handleScroll, useWindowScroll])
