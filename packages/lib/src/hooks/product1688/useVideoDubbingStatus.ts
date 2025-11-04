@@ -102,7 +102,7 @@ export function useVideoDubbingStatus({
             }
             lastStatus.current = data.status
         }
-    }, [data?.status, data?.dubbedVideoUrl, data?.errorMessage, onComplete, onError])
+    }, [data, onComplete, onError])
 
     return {
         status: data?.status,
