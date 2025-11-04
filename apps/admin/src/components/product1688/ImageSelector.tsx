@@ -17,7 +17,7 @@ interface ImageSelectorProps {
 
 export function ImageSelector({ productId, images, selectedImages: initialSelected = [], onSuccess }: ImageSelectorProps) {
   const api = useApi()
-  const { info, success, error: showError } = useNotificationStore()
+  const { info, success } = useNotificationStore()
   const [selected, setSelected] = useState<Set<string>>(new Set(initialSelected))
   const [isLoading, setIsLoading] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
@@ -67,9 +67,11 @@ export function ImageSelector({ productId, images, selectedImages: initialSelect
 
     for (let i = 0; i < selectedArray.length; i++) {
       const imageUrl = selectedArray[i]
+      if (!imageUrl) continue
+
       // Extract file extension from URL, default to .jpg
       const urlParts = imageUrl.split('.')
-      const extension = urlParts[urlParts.length - 1].split('?')[0] || 'jpg'
+      const extension = urlParts[urlParts.length - 1]?.split('?')[0] || 'jpg'
       const filename = `1688-product-${productId}-${i + 1}.${extension}`
 
       try {

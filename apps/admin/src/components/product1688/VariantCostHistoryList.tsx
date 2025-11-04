@@ -162,7 +162,7 @@ export function VariantCostHistoryList({ productId, variantSku }: VariantCostHis
                   )}
                   {item.internationalShippingVN > 0 && (
                     <div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">Int'l Ship (VN)</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">Int&apos;l Ship (VN)</div>
                       <div>{formatCurrency(item.internationalShippingVN)}</div>
                     </div>
                   )}
