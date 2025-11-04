@@ -52,11 +52,10 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
 
     // Poll status when video is processing
     const isProcessing = product.videoStatus === 'PROCESSING' || product.videoStatus === 'QUEUED'
-    const { data: statusData, refetch: refetchStatus } = useVideoDubbingStatus({
+    const statusData = useVideoDubbingStatus({
         api,
         product1688Id: product.id,
         enabled: isProcessing,
-        refetchInterval: isProcessing ? 3000 : false, // Poll every 3 seconds
     })
 
     // Refetch product when status changes to completed or failed
@@ -118,7 +117,7 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
                 return <Badge variant="secondary">Đang nhận dạng giọng nói</Badge>
             case 'TRANSLATING':
                 return <Badge variant="secondary">Đang dịch</Badge>
-            case 'GENERATING_TTS':
+            case 'GENERATING_VOICE':
                 return <Badge variant="secondary">Đang tạo giọng nói</Badge>
             case 'ENCODING_VIDEO':
                 return <Badge variant="secondary">Đang mã hóa video</Badge>
@@ -132,8 +131,6 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
                 )
             case 'FAILED':
                 return <Badge variant="destructive">Thất bại</Badge>
-            case 'CANCELLED':
-                return <Badge variant="secondary">Đã hủy</Badge>
             default:
                 return null
         }
@@ -205,17 +202,6 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
                             <Progress value={statusData.progress} className="w-full" />
                         </div>
 
-                        {statusData.estimatedCompletion && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                Dự kiến hoàn thành:{' '}
-                                {new Date(statusData.estimatedCompletion).toLocaleTimeString('vi-VN')}
-                            </p>
-                        )}
-
-                        {statusData.retryCount > 0 && (
-                            <p className="text-sm text-amber-600">Số lần thử lại: {statusData.retryCount}</p>
-                        )}
-
                         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                             <Button
                                 variant="destructive"
@@ -250,12 +236,6 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
                                 Xử lý thất bại
                             </h3>
                             <p className="text-sm text-red-800 dark:text-red-200">{statusData.errorMessage}</p>
-                            {statusData.retryCount >= 3 && (
-                                <p className="text-sm text-red-700 dark:text-red-300 mt-2">
-                                    Đã thử lại {statusData.retryCount} lần. Vui lòng kiểm tra video gốc hoặc liên hệ hỗ
-                                    trợ.
-                                </p>
-                            )}
                         </div>
                     </div>
                 </div>
@@ -315,9 +295,9 @@ export function VideoTab({ product, onRefetch }: VideoTabProps) {
                         </Button>
                     </div>
 
-                    {statusData?.completedAt && (
+                    {statusData?.updatedAt && (
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
-                            Hoàn thành lúc: {new Date(statusData.completedAt).toLocaleString('vi-VN')}
+                            Cập nhật lúc: {new Date(statusData.updatedAt).toLocaleString('vi-VN')}
                         </p>
                     )}
                 </div>

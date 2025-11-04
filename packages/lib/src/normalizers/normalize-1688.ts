@@ -45,7 +45,7 @@ function extractProductId(raw: Raw1688Data, url: string): string {
 
     // Fallback: extract from URL
     // URL format: https://detail.1688.com/offer/725123406270.html
-    const match = url.match(/offer[\/](\d+)/)
+    const match = url.match(/offer\/(\d+)/)
     if (match && match[1]) return match[1]
 
     throw new Error('Could not extract product ID')
