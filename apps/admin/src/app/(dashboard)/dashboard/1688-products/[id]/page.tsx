@@ -59,7 +59,11 @@ function Product1688DetailPageContent() {
 
         <div className="flex items-center gap-2">
           {product.status === Product1688Status.PENDING_REVIEW && (
-            <TranslateDialog productId={product.id} onSuccess={refetch} />
+            <TranslateDialog
+              productId={product.id}
+              productName={product.nameVi || product.nameZh}
+              onSuccess={refetch}
+            />
           )}
           {(product.status === Product1688Status.TRANSLATED || product.status === Product1688Status.REJECTED) && (
             <ApproveDialog product={product} onSuccess={refetch} />

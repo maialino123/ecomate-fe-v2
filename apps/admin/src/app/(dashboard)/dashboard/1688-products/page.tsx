@@ -80,25 +80,25 @@ function Product1688ListPageContent() {
                     <table className="w-full">
                         <thead className="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider max-w-sm">
                                     Product
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-28">
                                     Price (CNY)
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
                                     Status
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-28">
                                     Video
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
                                     Variants
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-36">
                                     Created
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-48 sticky right-0 bg-gray-50 dark:bg-gray-700">
                                     Actions
                                 </th>
                             </tr>
@@ -112,14 +112,14 @@ function Product1688ListPageContent() {
                                 </tr>
                             ) : (
                                 products.map(product => (
-                                    <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <td className="px-6 py-4">
+                                    <tr key={product.id} className="group hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td className="px-6 py-4 max-w-sm">
                                             <div className="flex items-start gap-3">
                                                 {product.thumbnail && (
                                                     <img
                                                         src={product.thumbnail}
                                                         alt={product.nameZh}
-                                                        className="w-12 h-12 object-cover rounded"
+                                                        className="w-12 h-12 object-cover rounded flex-shrink-0"
                                                         referrerPolicy="no-referrer"
                                                         crossOrigin="anonymous"
                                                     />
@@ -144,16 +144,16 @@ function Product1688ListPageContent() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white w-28">
                                             {product.priceMinCNY}
                                             {product.priceMaxCNY && product.priceMaxCNY !== product.priceMinCNY && (
                                                 <> - {product.priceMaxCNY}</>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-6 py-4 whitespace-nowrap w-32">
                                             <Product1688StatusBadge status={product.status} />
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-6 py-4 whitespace-nowrap w-28">
                                             {product.dubbedVideoUrl ? (
                                                 <Badge
                                                     variant="default"
@@ -182,13 +182,13 @@ function Product1688ListPageContent() {
                                                 <span className="text-gray-400 text-xs">-</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 w-24">
                                             {product.variantCount}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 w-36">
                                             {formatDateTime(product.createdAt)}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-48 sticky right-0 bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-700 shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.3)]">
                                             <div className="flex items-center justify-end gap-2">
                                                 {/* View Details */}
                                                 <button
@@ -203,7 +203,11 @@ function Product1688ListPageContent() {
 
                                                 {/* Translate (if not translated) */}
                                                 {product.status === Product1688Status.PENDING_REVIEW && (
-                                                    <TranslateDialog productId={product.id} onSuccess={refetch} />
+                                                    <TranslateDialog
+                                                        productId={product.id}
+                                                        productName={product.nameVi || product.nameZh}
+                                                        onSuccess={refetch}
+                                                    />
                                                 )}
 
                                                 {/* Approve (if translated) */}

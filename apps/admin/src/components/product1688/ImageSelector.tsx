@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import * as Checkbox from '@radix-ui/react-checkbox'
-import { Check, Save, AlertCircle } from 'lucide-react'
+import { Check, Save, AlertCircle, Download } from 'lucide-react'
 import { Button } from '@workspace/ui/components/Button'
 import { useApi } from '@workspace/shared/providers'
 import { cn } from '@workspace/ui/lib/utils'
+import { useNotificationStore } from '@workspace/lib'
 
 interface ImageSelectorProps {
   productId: string
@@ -16,8 +17,10 @@ interface ImageSelectorProps {
 
 export function ImageSelector({ productId, images, selectedImages: initialSelected = [], onSuccess }: ImageSelectorProps) {
   const api = useApi()
+  const { info, success, error: showError } = useNotificationStore()
   const [selected, setSelected] = useState<Set<string>>(new Set(initialSelected))
   const [isLoading, setIsLoading] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const toggleImage = (imageUrl: string) => {
@@ -52,6 +55,68 @@ export function ImageSelector({ productId, images, selectedImages: initialSelect
     return JSON.stringify(current) !== JSON.stringify(initial)
   }
 
+  const handleDownloadImages = async () => {
+    if (selected.size === 0) return
+
+    setIsDownloading(true)
+    info(`Downloading ${selected.size} images...`, 'Download Started')
+
+    const selectedArray = Array.from(selected)
+    let successCount = 0
+    let failCount = 0
+
+    for (let i = 0; i < selectedArray.length; i++) {
+      const imageUrl = selectedArray[i]
+      // Extract file extension from URL, default to .jpg
+      const urlParts = imageUrl.split('.')
+      const extension = urlParts[urlParts.length - 1].split('?')[0] || 'jpg'
+      const filename = `1688-product-${productId}-${i + 1}.${extension}`
+
+      try {
+        // Try to download via blob (better for CORS)
+        const response = await fetch(imageUrl)
+
+        if (!response.ok) throw new Error('Fetch failed')
+
+        const blob = await response.blob()
+        const blobUrl = URL.createObjectURL(blob)
+
+        // Create temporary link and trigger download
+        const a = document.createElement('a')
+        a.href = blobUrl
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+
+        // Clean up blob URL after a short delay
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
+        successCount++
+      } catch (err) {
+        // Fallback: open in new tab if blob download fails (CORS issue)
+        console.warn(`Failed to download ${filename}, opening in new tab:`, err)
+        window.open(imageUrl, '_blank')
+        failCount++
+      }
+
+      // Small delay between downloads to avoid browser blocking
+      if (i < selectedArray.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+    }
+
+    setIsDownloading(false)
+
+    if (failCount > 0) {
+      info(
+        `Downloaded ${successCount} images successfully. ${failCount} images opened in new tabs due to browser restrictions.`,
+        'Download Completed'
+      )
+    } else {
+      success(`Successfully downloaded ${successCount} images!`, 'Download Complete')
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -61,14 +126,25 @@ export function ImageSelector({ productId, images, selectedImages: initialSelect
             {selected.size} of {images.length} images selected
           </p>
         </div>
-        <Button
-          onClick={handleSave}
-          isDisabled={isLoading || !hasChanges()}
-          className="flex items-center gap-2"
-        >
-          <Save className="w-4 h-4" />
-          {isLoading ? 'Saving...' : 'Save Selection'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleDownloadImages}
+            isDisabled={isDownloading || selected.size === 0}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            {isDownloading ? 'Downloading...' : `Download Selected (${selected.size})`}
+          </Button>
+          <Button
+            onClick={handleSave}
+            isDisabled={isLoading || !hasChanges()}
+            className="flex items-center gap-2"
+          >
+            <Save className="w-4 h-4" />
+            {isLoading ? 'Saving...' : 'Save Selection'}
+          </Button>
+        </div>
       </div>
 
       {error && (

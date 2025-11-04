@@ -1,73 +1,65 @@
-import { useState } from 'react'
 import { useApi } from '@workspace/shared/providers'
 import { useProduct1688Translate } from '@workspace/lib'
-import { Button } from '@workspace/ui/components/Button'
+import { Badge } from '@workspace/ui/components/Badge'
 import { Loader2, Languages } from 'lucide-react'
+import { useNotificationStore } from '@workspace/lib'
 
 interface TranslateDialogProps {
   productId: string
+  productName?: string
   onSuccess?: () => void
 }
 
-export function TranslateDialog({ productId, onSuccess }: TranslateDialogProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [force, setForce] = useState(false)
+export function TranslateDialog({ productId, productName, onSuccess }: TranslateDialogProps) {
   const api = useApi()
+  const { info } = useNotificationStore()
 
   const translateMutation = useProduct1688Translate({
     api,
-    onSuccess: () => {
-      setIsOpen(false)
-      setForce(false)
+    onSuccess: data => {
       onSuccess?.()
+      // Success toast is already handled in the hook
     },
   })
 
   const handleTranslate = () => {
-    translateMutation.mutate({ id: productId, options: { forceRefresh: force } })
+    // Show start notification
+    info(
+      `Translation started${productName ? ` for ${productName}` : ''}`,
+      'Translation In Progress'
+    )
+
+    // Trigger translation without confirmation
+    translateMutation.mutate({ id: productId, options: {} })
   }
 
+  // Show progress indicator when translating
+  if (translateMutation.isPending) {
+    const progress = translateMutation.data?.progress
+    const progressText = progress
+      ? `${progress.completed}/${progress.total}`
+      : 'Processing...'
+
+    return (
+      <Badge
+        variant="secondary"
+        className="flex items-center gap-1.5 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 animate-pulse"
+      >
+        <Loader2 className="w-3 h-3 animate-spin" />
+        <span className="text-xs font-medium">Translating {progressText}</span>
+      </Badge>
+    )
+  }
+
+  // Show translate button when idle
   return (
-    <>
-      <Button onClick={() => setIsOpen(true)} variant="outline" size="sm">
-        <Languages className="w-4 h-4 mr-2" />
-        Translate
-      </Button>
-
-      {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Translate Product</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              This will translate the product name, description, and variants from Chinese to Vietnamese using AI.
-            </p>
-
-            <div className="mb-4">
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={force} onChange={e => setForce(e.target.checked)} className="rounded" />
-                <span>Force re-translate (even if already translated)</span>
-              </label>
-            </div>
-
-            <div className="flex gap-2">
-              <Button onClick={handleTranslate} isDisabled={translateMutation.isPending} className="flex-1">
-                {translateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Translate
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsOpen(false)
-                  setForce(false)
-                }}
-                variant="outline"
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    <button
+      onClick={handleTranslate}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 border border-blue-600 dark:border-blue-400 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+      title="Translate to Vietnamese"
+    >
+      <Languages className="w-4 h-4" />
+      <span>Translate</span>
+    </button>
   )
 }

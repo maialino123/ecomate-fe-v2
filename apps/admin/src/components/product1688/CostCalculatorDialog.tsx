@@ -169,7 +169,7 @@ export function CostCalculatorDialog({
                   currency="CNY"
                   label="Giá nhập từ 1688"
                   placeholder="5.2"
-                  helperText="Giá nhập hàng từ nhà cung cấp (tính bằng CNY)"
+                  helperText="Giá 1 đơn vị sản phẩm (CNY). Số lượng chỉ ảnh hưởng đến chi phí vận chuyển trung bình."
                   {...register('importPrice', {
                     required: 'Giá nhập là bắt buộc',
                     min: { value: 0, message: 'Giá phải >= 0' },
@@ -289,7 +289,9 @@ export function CostCalculatorDialog({
                         {errors.quantity.message}
                       </p>
                     )}
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Số sản phẩm trong lô hàng</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Số sản phẩm trong lô hàng. Số lượng lớn → chi phí ship/xử lý trung bình thấp hơn.
+                    </p>
                   </div>
                 </div>
               </div>
