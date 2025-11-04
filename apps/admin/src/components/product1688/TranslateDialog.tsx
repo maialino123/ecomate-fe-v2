@@ -16,7 +16,7 @@ export function TranslateDialog({ productId, productName, onSuccess }: Translate
 
   const translateMutation = useProduct1688Translate({
     api,
-    onSuccess: data => {
+    onSuccess: () => {
       onSuccess?.()
       // Success toast is already handled in the hook
     },
@@ -35,7 +35,7 @@ export function TranslateDialog({ productId, productName, onSuccess }: Translate
 
   // Show progress indicator when translating
   if (translateMutation.isPending) {
-    const progress = translateMutation.data?.progress
+    const progress = (translateMutation.data as any)?.progress
     const progressText = progress
       ? `${progress.completed}/${progress.total}`
       : 'Processing...'
