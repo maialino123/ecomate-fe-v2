@@ -82,7 +82,7 @@ export interface Product1688Entity {
     // Video fields
     originalVideoUrl?: string
     dubbedVideoUrl?: string
-    videoStatus?: 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+    videoStatus?: 'PENDING' | 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
     hlsPlaylistUrl?: string
     subtitlesUrl?: string
 
