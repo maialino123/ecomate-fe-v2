@@ -52,3 +52,38 @@ export const downloadFile = (url: string) => {
     a.click()
     document.body.removeChild(a)
 }
+
+/**
+ * Download video with CORS fallback strategy
+ * Tries blob download first, falls back to window.open if CORS fails
+ * @param url - Video URL to download
+ * @param filename - Desired filename for the download
+ * @throws Error if download fails (after fallback attempt)
+ */
+export const downloadVideoWithFallback = async (url: string, filename: string): Promise<void> => {
+    try {
+        // Try blob download (better UX, filename control)
+        const response = await fetch(url)
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+
+        const blob = await response.blob()
+        const blobUrl = URL.createObjectURL(blob)
+
+        const a = document.createElement('a')
+        a.href = blobUrl
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+
+        // Cleanup blob URL after a delay
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
+    } catch (error) {
+        // Fallback to window.open (works even with CORS restrictions)
+        console.warn('Blob download failed, falling back to window.open:', error)
+        window.open(url, '_blank')
+
+        // Re-throw to let caller know fallback was used
+        throw new Error('Blob download failed, opened in new tab')
+    }
+}
