@@ -1,0 +1,59 @@
+/* Tour Section Custom Styles */
+
+/* Override ScrollStack card styling for tour cards */
+.tour-scroll-stack .scroll-stack-card {
+    height: auto !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+
+    /* Anti-jitter optimizations */
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+
+    /* Force GPU acceleration */
+    will-change: transform;
+
+    /* Smooth transitions */
+    transition: transform 0.1s ease-out;
+    -webkit-transition: transform 0.1s ease-out;
+}
+
+/* Ensure smooth scrolling */
+.tour-scroll-stack {
+    -webkit-overflow-scrolling: touch;
+    overflow: visible;
+}
+
+/* Additional spacing for tour section */
+.tour-card-item {
+    margin-bottom: 0 !important;
+}
+
+/* Performance optimizations */
+.tour-scroll-stack .scroll-stack-card {
+    /* Use contain for better performance, but remove content-visibility
+       which can cause layout thrashing during scroll */
+    contain: layout style;
+    /* Removed: content-visibility: auto; - causes performance issues on scroll */
+}
+
+/* Smooth transitions for transforms */
+.tour-scroll-stack .scroll-stack-card * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent layout shifts */
+.tour-scroll-stack .scroll-stack-inner {
+    will-change: scroll-position;
+    /* Override excessive default padding from ScrollStack */
+    padding: 2rem 1rem 5rem !important;
+}

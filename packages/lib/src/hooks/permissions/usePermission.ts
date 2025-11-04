@@ -12,8 +12,11 @@ import {
     hasRoleLevel,
     FeatureCategory,
     PermissionAction,
-    ROLE_LEVELS,
 } from '../../constants/permissions'
+
+// Unused import for future feature
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { ROLE_LEVELS } from '../../constants/permissions'
 
 export interface PermissionHookResult {
     // User info
@@ -201,10 +204,7 @@ export function usePermission(): PermissionHookResult {
  * const canDeleteUser = useHasPermission('USERS', 'DELETE')
  * {canDeleteUser && <DeleteButton />}
  */
-export function useHasPermission(
-    feature: FeatureCategory,
-    action: PermissionAction,
-): boolean {
+export function useHasPermission(feature: FeatureCategory, action: PermissionAction): boolean {
     const { user } = useAuthStore()
     const role = user?.role || null
     return useMemo(() => hasPermission(role, feature, action), [role, feature, action])
@@ -233,8 +233,5 @@ export function useHasRole(requiredRole: UserRole): boolean {
  */
 export function useHasAnyRole(roles: UserRole[]): boolean {
     const { user } = useAuthStore()
-    return useMemo(
-        () => user?.role !== undefined && roles.includes(user.role),
-        [user?.role, roles],
-    )
+    return useMemo(() => user?.role !== undefined && roles.includes(user.role), [user?.role, roles])
 }

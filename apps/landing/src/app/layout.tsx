@@ -3,19 +3,23 @@ import '@workspace/ui/globals.css'
 import { Open_Sans } from 'next/font/google'
 import type { Metadata } from 'next'
 import SeoJsonLd from '@/components/SeoJsonLd'
+import { TwentyFirstToolbar } from '@21st-extension/toolbar-next'
+import { ReactPlugin } from '@21st-extension/react'
+import SplashCursor from '@workspace/ui/components/SplashCursor'
 
 const openSans = Open_Sans({
     subsets: ['latin', 'vietnamese'],
     display: 'swap',
     variable: '--font-open-sans',
-    weight: ['400', '500', '600', '700'],
+    weight: ['400', '700'],
+    preload: true,
 })
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ecomate-fe-v2-landing.vercel.app'
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'Ecomate'
 
 export const viewport = {
-    themeColor: '#10b981', // Emerald color matching your brand
+    themeColor: '#10b981',
 }
 
 export const metadata: Metadata = {
@@ -147,6 +151,7 @@ export default function RootLayout({
                 className={`${openSans.variable} font-sans antialiased bg-gradient-to-br from-[#dee1e1] to-[#f4f4f4] text-slate-900 selection:bg-emerald-200`}
                 suppressHydrationWarning
             >
+                {/* Splash Cursor Effect */}
                 {/* JSON‑LD for Google Ads/SEO */}
                 <SeoJsonLd data={orgJsonLd} />
                 <SeoJsonLd data={webSiteJsonLd} />
