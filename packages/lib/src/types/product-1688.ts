@@ -65,7 +65,7 @@ export const Product1688Schema = z.object({
     categoryName: z.string().optional(),
 
     // Video (optional)
-    videoUrl: z.string().url().optional(),
+    videoUrl: z.string().optional(),
 
     // Metadata
     extractedAt: z.string().datetime(),
