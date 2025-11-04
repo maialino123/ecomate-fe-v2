@@ -34,15 +34,9 @@ export interface ImageSourceSet {
  * getOptimizedImageUrl('living-room', 640) // 'https://cdn.ecomatehome.com/landing/banners/living-room-640w.webp'
  * ```
  */
-export function getOptimizedImageUrl(
-    imagePath: string,
-    width: number = 1024,
-    format: 'webp' | 'png' = 'webp'
-): string {
+export function getOptimizedImageUrl(imagePath: string, width: number = 1024, format: 'webp' | 'png' = 'webp'): string {
     // Remove any existing extension or size suffix
-    const baseName = imagePath
-        .replace(/\.(png|jpg|jpeg|webp)$/i, '')
-        .replace(/-(320w|640w|1024w|1920w)$/i, '')
+    const baseName = imagePath.replace(/\.(png|jpg|jpeg|webp)$/i, '').replace(/-(320w|640w|1024w|1920w)$/i, '')
 
     // For PNG fallback, don't add width suffix
     if (format === 'png') {
@@ -67,13 +61,8 @@ export function getOptimizedImageUrl(
  * //           https://cdn.ecomatehome.com/landing/banners/living-room-640w.webp 640w, ...'
  * ```
  */
-export function getImageSrcSet(
-    imagePath: string,
-    format: 'webp' | 'png' = 'webp'
-): string {
-    return RESPONSIVE_WIDTHS
-        .map(width => `${getOptimizedImageUrl(imagePath, width, format)} ${width}w`)
-        .join(', ')
+export function getImageSrcSet(imagePath: string, format: 'webp' | 'png' = 'webp'): string {
+    return RESPONSIVE_WIDTHS.map(width => `${getOptimizedImageUrl(imagePath, width, format)} ${width}w`).join(', ')
 }
 
 /**
@@ -95,7 +84,7 @@ export function getResponsiveImageConfig(
         defaultWidth?: number
         format?: 'webp' | 'png'
         customSizes?: string
-    }
+    },
 ): ImageSourceSet {
     const { defaultWidth = 1024, format = 'webp', customSizes } = options || {}
 
@@ -116,9 +105,7 @@ export function getResponsiveImageConfig(
  * For inline base64, you'll need to generate it during build time.
  */
 export function getBlurPlaceholder(imagePath: string): string {
-    const baseName = imagePath
-        .replace(/\.(png|jpg|jpeg|webp)$/i, '')
-        .replace(/-(320w|640w|1024w|1920w)$/i, '')
+    const baseName = imagePath.replace(/\.(png|jpg|jpeg|webp)$/i, '').replace(/-(320w|640w|1024w|1920w)$/i, '')
 
     return `${CDN_BASE_URL}/${IMAGE_PREFIX}/${baseName}-thumb.webp`
 }
@@ -135,9 +122,7 @@ export function getBlurPlaceholder(imagePath: string): string {
  * ```
  */
 export function convertLocalPathToCDN(localPath: string): string {
-    return localPath
-        .replace(/^\/images\/snapshot-banner\//, '')
-        .replace(/\.(png|jpg|jpeg|webp)$/i, '')
+    return localPath.replace(/^\/images\/snapshot-banner\//, '').replace(/\.(png|jpg|jpeg|webp)$/i, '')
 }
 
 /**
@@ -161,10 +146,7 @@ export function shouldUseCDN(): boolean {
  * @param width - Optional width
  * @returns Image URL (CDN or local based on configuration)
  */
-export function getImageUrl(
-    imagePath: string,
-    width: number = 1024
-): string {
+export function getImageUrl(imagePath: string, width: number = 1024): string {
     // If it's already a CDN path (no leading slash), use it
     if (!imagePath.startsWith('/')) {
         return getOptimizedImageUrl(imagePath, width)
@@ -215,13 +197,9 @@ export const IMAGE_CONFIGS = {
 /**
  * Get quality setting based on device
  */
-export function getImageQuality(
-    type: keyof typeof IMAGE_CONFIGS = 'tourCard'
-): number {
+export function getImageQuality(type: keyof typeof IMAGE_CONFIGS = 'tourCard'): number {
     if (typeof window === 'undefined') return IMAGE_CONFIGS[type].quality.desktop
 
     const isMobile = window.innerWidth < 768
-    return isMobile
-        ? IMAGE_CONFIGS[type].quality.mobile
-        : IMAGE_CONFIGS[type].quality.desktop
+    return isMobile ? IMAGE_CONFIGS[type].quality.mobile : IMAGE_CONFIGS[type].quality.desktop
 }

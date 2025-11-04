@@ -25,6 +25,7 @@ export function normalize1688Product(raw: Raw1688Data, sourceUrl: string): Produ
         supplierName: extractSupplierName(raw),
         categoryId: extractCategoryId(raw),
         categoryName: extractCategoryName(raw),
+        videoUrl: extractVideoUrl(raw),
         extractedAt: new Date().toISOString(),
         extractedBy: 'ecomate-extension',
     }
@@ -44,7 +45,7 @@ function extractProductId(raw: Raw1688Data, url: string): string {
 
     // Fallback: extract from URL
     // URL format: https://detail.1688.com/offer/725123406270.html
-    const match = url.match(/offer[/](\d+)/)
+    const match = url.match(/offer[\/](\d+)/)
     if (match && match[1]) return match[1]
 
     throw new Error('Could not extract product ID')
@@ -354,4 +355,43 @@ function extractCategoryId(raw: Raw1688Data): string | undefined {
  */
 function extractCategoryName(raw: Raw1688Data): string | undefined {
     return raw.categoryName || raw.catName || undefined
+}
+
+/**
+ * Extract video URL from raw data
+ * Video can come from multiple sources in the raw data
+ */
+function extractVideoUrl(raw: Raw1688Data): string | undefined {
+    // Strategy 1: Direct videoUrl field
+    if (raw.videoUrl) {
+        return String(raw.videoUrl)
+    }
+
+    // Strategy 2: videoList array (take first)
+    if (Array.isArray(raw.videoList) && raw.videoList.length > 0) {
+        const firstVideo = raw.videoList[0]
+        const url = typeof firstVideo === 'string' ? firstVideo : firstVideo.videoUrl || firstVideo.url
+        if (url) return String(url)
+    }
+
+    // Strategy 3: offerVideoList array
+    if (Array.isArray(raw.offerVideoList) && raw.offerVideoList.length > 0) {
+        const firstVideo = raw.offerVideoList[0]
+        const url = typeof firstVideo === 'string' ? firstVideo : firstVideo.videoUrl || firstVideo.url
+        if (url) return String(url)
+    }
+
+    // Strategy 4: mainVideo object
+    if (raw.mainVideo) {
+        const url = typeof raw.mainVideo === 'string' ? raw.mainVideo : raw.mainVideo.videoUrl || raw.mainVideo.url
+        if (url) return String(url)
+    }
+
+    // Strategy 5: From DOM extraction (stored in _videoUrl by json-extractor)
+    if (raw._videoUrl) {
+        return String(raw._videoUrl)
+    }
+
+    // No video found
+    return undefined
 }

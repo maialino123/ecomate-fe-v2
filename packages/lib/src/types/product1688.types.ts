@@ -4,261 +4,269 @@
  */
 
 export enum Product1688Status {
-  PENDING_REVIEW = 'PENDING_REVIEW',
-  TRANSLATED = 'TRANSLATED',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
+    PENDING_REVIEW = 'PENDING_REVIEW',
+    TRANSLATED = 'TRANSLATED',
+    APPROVED = 'APPROVED',
+    REJECTED = 'REJECTED',
 }
 
 export enum RejectionReason {
-  LOW_QUALITY = 'LOW_QUALITY',
-  TOO_EXPENSIVE = 'TOO_EXPENSIVE',
-  ALREADY_HAVE = 'ALREADY_HAVE',
-  NOT_SUITABLE = 'NOT_SUITABLE',
-  SUPPLIER_ISSUES = 'SUPPLIER_ISSUES',
-  OTHER = 'OTHER',
+    LOW_QUALITY = 'LOW_QUALITY',
+    TOO_EXPENSIVE = 'TOO_EXPENSIVE',
+    ALREADY_HAVE = 'ALREADY_HAVE',
+    NOT_SUITABLE = 'NOT_SUITABLE',
+    SUPPLIER_ISSUES = 'SUPPLIER_ISSUES',
+    OTHER = 'OTHER',
 }
 
 export interface Product1688Variant {
-  sku: string;
-  nameZh: string;
-  nameVi?: string;
-  attributes: Record<string, string>;
-  price: number;
-  stock?: number;
-  image?: string;
-  costCalculation?: {
-    // Latest cost calculation results
-    baseCost: number;
-    effectiveCost: number;
-    suggestedSellingPrice: number;
-    netProfit: number;
-    breakEvenPrice: number;
-    lastCalculatedAt: string;
-  };
+    sku: string
+    nameZh: string
+    nameVi?: string
+    attributes: Record<string, string>
+    price: number
+    stock?: number
+    image?: string
+    costCalculation?: {
+        // Latest cost calculation results
+        baseCost: number
+        effectiveCost: number
+        suggestedSellingPrice: number
+        netProfit: number
+        breakEvenPrice: number
+        lastCalculatedAt: string
+    }
 }
 
 export interface CostCalculation {
-  importPrice: number;
-  domesticShippingCN?: number;
-  internationalShippingVN?: number;
-  handlingFee?: number;
-  exchangeRateCNY: number;
-  quantity?: number;
-  returnRate?: number;
-  platformFeeRate?: number;
-  profitMarginRate?: number;
-  finalPriceVND?: number;
+    importPrice: number
+    domesticShippingCN?: number
+    internationalShippingVN?: number
+    handlingFee?: number
+    exchangeRateCNY: number
+    quantity?: number
+    returnRate?: number
+    platformFeeRate?: number
+    profitMarginRate?: number
+    finalPriceVND?: number
 }
 
 export interface Product1688Entity {
-  id: string;
-  nameZh: string;
-  descriptionZh?: string;
-  originalUrl: string;
-  nameVi?: string;
-  descriptionVi?: string;
-  priceMinCNY: number;
-  priceMaxCNY?: number;
-  currency: string;
-  costCalculation?: CostCalculation;
-  variants?: Product1688Variant[];
-  variantCount: number;
-  supplierName?: string;
-  supplierId1688?: string;
-  images: string[];
-  selectedImages: string[];
-  thumbnail?: string;
-  status: Product1688Status;
-  rejectionReason?: RejectionReason;
-  rejectedAt?: string;
-  rejectedBy?: string;
-  createdBy?: string;
-  reviewedBy?: string;
-  createdAt: string;
-  updatedAt: string;
-  productId?: string;
+    id: string
+    nameZh: string
+    descriptionZh?: string
+    originalUrl: string
+    nameVi?: string
+    descriptionVi?: string
+    priceMinCNY: number
+    priceMaxCNY?: number
+    currency: string
+    costCalculation?: CostCalculation
+    variants?: Product1688Variant[]
+    variantCount: number
+    supplierName?: string
+    supplierId1688?: string
+    images: string[]
+    selectedImages: string[]
+    thumbnail?: string
+    status: Product1688Status
+    rejectionReason?: RejectionReason
+    rejectedAt?: string
+    rejectedBy?: string
+    createdBy?: string
+    reviewedBy?: string
+    createdAt: string
+    updatedAt: string
+    productId?: string
 
-  // Relations (populated)
-  createdByUser?: {
-    id: string;
-    email: string;
-    firstName?: string;
-    lastName?: string;
-  };
-  reviewedByUser?: {
-    id: string;
-    email: string;
-    firstName?: string;
-    lastName?: string;
-  };
-  rejectedByUser?: {
-    id: string;
-    email: string;
-    firstName?: string;
-    lastName?: string;
-  };
-  product?: any; // Product type
+    // Video fields
+    originalVideoUrl?: string
+    dubbedVideoUrl?: string
+    videoStatus?: 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+    hlsPlaylistUrl?: string
+    subtitlesUrl?: string
+
+    // Relations (populated)
+    createdByUser?: {
+        id: string
+        email: string
+        firstName?: string
+        lastName?: string
+    }
+    reviewedByUser?: {
+        id: string
+        email: string
+        firstName?: string
+        lastName?: string
+    }
+    rejectedByUser?: {
+        id: string
+        email: string
+        firstName?: string
+        lastName?: string
+    }
+    product?: any // Product type
 }
 
 // Request DTOs
 export interface CreateProduct1688Request {
-  nameZh: string;
-  descriptionZh?: string;
-  originalUrl: string;
-  priceMinCNY: number;
-  priceMaxCNY?: number;
-  images: string[];
-  thumbnail?: string;
-  variants?: Product1688Variant[];
-  supplierName?: string;
-  supplierId1688?: string;
+    nameZh: string
+    descriptionZh?: string
+    originalUrl: string
+    priceMinCNY: number
+    priceMaxCNY?: number
+    images: string[]
+    thumbnail?: string
+    variants?: Product1688Variant[]
+    supplierName?: string
+    supplierId1688?: string
+    originalVideoUrl?: string
 }
 
 export interface UpdateProduct1688Request {
-  nameVi?: string;
-  descriptionVi?: string;
-  variants?: Product1688Variant[];
-  costCalculation?: CostCalculation;
-  selectedImages?: string[];
+    nameVi?: string
+    descriptionVi?: string
+    variants?: Product1688Variant[]
+    costCalculation?: CostCalculation
+    selectedImages?: string[]
 }
 
 export interface TranslateProduct1688Request {
-  translateName?: boolean;
-  translateDescription?: boolean;
-  translateVariants?: boolean;
-  forceRefresh?: boolean;
+    translateName?: boolean
+    translateDescription?: boolean
+    translateVariants?: boolean
+    forceRefresh?: boolean
 }
 
 export interface ApproveProduct1688Request {
-  sku: string;
-  categoryId: string;
-  supplierId?: string;
-  createSupplier?: boolean;
+    sku: string
+    categoryId: string
+    supplierId?: string
+    createSupplier?: boolean
 }
 
 export interface RejectProduct1688Request {
-  reason: RejectionReason;
-  note?: string;
+    reason: RejectionReason
+    note?: string
 }
 
 export interface QueryProduct1688Request {
-  status?: Product1688Status;
-  search?: string;
-  sortBy?: 'createdAt' | 'updatedAt' | 'priceMinCNY' | 'nameZh';
-  sortOrder?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
+    status?: Product1688Status
+    search?: string
+    sortBy?: 'createdAt' | 'updatedAt' | 'priceMinCNY' | 'nameZh'
+    sortOrder?: 'asc' | 'desc'
+    page?: number
+    limit?: number
 }
 
 // Response types
 export interface CreateProduct1688Response {
-  success: boolean;
-  data?: Product1688Entity;
-  error?: string;
-  existingId?: string;
-  existingType?: 'product1688' | 'product';
+    success: boolean
+    data?: Product1688Entity
+    error?: string
+    existingId?: string
+    existingType?: 'product1688' | 'product'
 }
 
 export interface DuplicateCheckResponse {
-  exists: boolean;
-  type?: 'product1688' | 'product';
-  id?: string;
-  name?: string;
+    exists: boolean
+    type?: 'product1688' | 'product'
+    id?: string
+    name?: string
 }
 
 export interface TranslationProgress {
-  total: number;
-  completed: number;
-  failed: number;
-  items: Array<{
-    field: string;
-    status: 'pending' | 'completed' | 'failed';
-    error?: string;
-  }>;
+    total: number
+    completed: number
+    failed: number
+    items: Array<{
+        field: string
+        status: 'pending' | 'completed' | 'failed'
+        error?: string
+    }>
 }
 
 export interface TranslateProduct1688Response {
-  product: Product1688Entity;
-  progress: TranslationProgress;
+    product: Product1688Entity
+    progress: TranslationProgress
 }
 
 export interface ApproveProduct1688Response {
-  success: boolean;
-  product: any; // Product type
-  product1688: Product1688Entity;
+    success: boolean
+    product: any // Product type
+    product1688: Product1688Entity
 }
 
 export interface Product1688ListResponse {
-  data: Product1688Entity[];
-  total: number;
-  page: number;
-  limit: number;
+    data: Product1688Entity[]
+    total: number
+    page: number
+    limit: number
 }
 
 // Variant Cost Calculation Types
 export interface SaveCostCalculationRequest {
-  product1688Id: string;
-  variantSku: string;
-  importPrice: number;
-  domesticShippingCN?: number;
-  internationalShippingVN?: number;
-  handlingFee?: number;
-  exchangeRateCNY: number;
-  quantity?: number;
-  returnRate?: number;
-  platformFeeRate?: number;
-  profitMarginRate?: number;
-  notes?: string;
+    product1688Id: string
+    variantSku: string
+    importPrice: number
+    domesticShippingCN?: number
+    internationalShippingVN?: number
+    handlingFee?: number
+    exchangeRateCNY: number
+    quantity?: number
+    returnRate?: number
+    platformFeeRate?: number
+    profitMarginRate?: number
+    notes?: string
 }
 
 export interface CostCalculationResult {
-  baseCost: number;
-  effectiveCost: number;
-  suggestedSellingPrice: number;
-  netProfit: number;
-  breakEvenPrice: number;
+    baseCost: number
+    effectiveCost: number
+    suggestedSellingPrice: number
+    netProfit: number
+    breakEvenPrice: number
 }
 
 export interface VariantCostHistoryItem {
-  id: string;
-  product1688Id: string;
-  variantSku: string;
-  userId: string;
-  importPrice: number;
-  domesticShippingCN: number;
-  internationalShippingVN: number;
-  handlingFee: number;
-  exchangeRateCNY: number;
-  quantity: number;
-  returnRate: number;
-  platformFeeRate: number;
-  profitMarginRate: number;
-  baseCost: number;
-  effectiveCost: number;
-  suggestedSellingPrice: number;
-  netProfit: number;
-  breakEvenPrice: number;
-  calculationData?: any;
-  notes?: string;
-  createdAt: string;
-  user?: {
-    id: string;
-    email: string;
-    firstName?: string;
-    lastName?: string;
-  };
+    id: string
+    product1688Id: string
+    variantSku: string
+    userId: string
+    importPrice: number
+    domesticShippingCN: number
+    internationalShippingVN: number
+    handlingFee: number
+    exchangeRateCNY: number
+    quantity: number
+    returnRate: number
+    platformFeeRate: number
+    profitMarginRate: number
+    baseCost: number
+    effectiveCost: number
+    suggestedSellingPrice: number
+    netProfit: number
+    breakEvenPrice: number
+    calculationData?: any
+    notes?: string
+    createdAt: string
+    user?: {
+        id: string
+        email: string
+        firstName?: string
+        lastName?: string
+    }
 }
 
 export interface SaveCostCalculationResponse {
-  success: boolean;
-  calculation: VariantCostHistoryItem;
-  result: CostCalculationResult;
+    success: boolean
+    calculation: VariantCostHistoryItem
+    result: CostCalculationResult
 }
 
 export interface VariantCostHistoryResponse {
-  product1688Id: string;
-  variantSku: string;
-  total: number;
-  history: VariantCostHistoryItem[];
+    product1688Id: string
+    variantSku: string
+    total: number
+    history: VariantCostHistoryItem[]
 }

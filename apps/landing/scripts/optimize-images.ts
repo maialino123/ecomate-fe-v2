@@ -81,7 +81,7 @@ async function getPngFiles(): Promise<string[]> {
  */
 async function generateWebPVariants(
     inputPath: string,
-    baseName: string
+    baseName: string,
 ): Promise<{ width: number; size: number; path: string }[]> {
     const results: { width: number; size: number; path: string }[] = []
 
@@ -103,7 +103,7 @@ async function generateWebPVariants(
         results.push({ width, size, path: outputPath })
 
         console.log(
-            `  ${colors.cyan}→${colors.reset} WebP ${width}w: ${colors.yellow}${formatBytes(size)}${colors.reset}`
+            `  ${colors.cyan}→${colors.reset} WebP ${width}w: ${colors.yellow}${formatBytes(size)}${colors.reset}`,
         )
     }
 
@@ -113,10 +113,7 @@ async function generateWebPVariants(
 /**
  * Generate optimized PNG fallback
  */
-async function generateOptimizedPng(
-    inputPath: string,
-    baseName: string
-): Promise<{ size: number; path: string }> {
+async function generateOptimizedPng(inputPath: string, baseName: string): Promise<{ size: number; path: string }> {
     const outputPath = join(OUTPUT_DIR, `${baseName}.png`)
 
     await sharp(inputPath)
@@ -132,9 +129,7 @@ async function generateOptimizedPng(
 
     const size = await getFileSize(outputPath)
 
-    console.log(
-        `  ${colors.cyan}→${colors.reset} PNG fallback: ${colors.yellow}${formatBytes(size)}${colors.reset}`
-    )
+    console.log(`  ${colors.cyan}→${colors.reset} PNG fallback: ${colors.yellow}${formatBytes(size)}${colors.reset}`)
 
     return { size, path: outputPath }
 }
@@ -144,7 +139,7 @@ async function generateOptimizedPng(
  */
 async function generateThumbnail(
     inputPath: string,
-    baseName: string
+    baseName: string,
 ): Promise<{ size: number; path: string; base64: string }> {
     const outputPath = join(OUTPUT_DIR, `${baseName}-thumb.webp`)
 
@@ -163,9 +158,7 @@ async function generateThumbnail(
     const size = buffer.length
     const base64 = `data:image/webp;base64,${buffer.toString('base64')}`
 
-    console.log(
-        `  ${colors.cyan}→${colors.reset} Thumbnail: ${colors.yellow}${formatBytes(size)}${colors.reset}`
-    )
+    console.log(`  ${colors.cyan}→${colors.reset} Thumbnail: ${colors.yellow}${formatBytes(size)}${colors.reset}`)
 
     return { size, path: outputPath, base64 }
 }
@@ -180,7 +173,7 @@ async function processImage(filename: string): Promise<void> {
     const originalSize = await getFileSize(inputPath)
 
     console.log(
-        `\n${colors.bright}${colors.blue}Processing:${colors.reset} ${filename} ${colors.yellow}(${formatBytes(originalSize)})${colors.reset}`
+        `\n${colors.bright}${colors.blue}Processing:${colors.reset} ${filename} ${colors.yellow}(${formatBytes(originalSize)})${colors.reset}`,
     )
 
     // Generate all variants
@@ -194,10 +187,10 @@ async function processImage(filename: string): Promise<void> {
     const savingsPercent = Math.round(((originalSize - totalWebPSize) / originalSize) * 100)
 
     console.log(
-        `  ${colors.green}✓${colors.reset} Total WebP: ${colors.yellow}${formatBytes(totalWebPSize)}${colors.reset} ${colors.green}(${savingsPercent}% smaller)${colors.reset}`
+        `  ${colors.green}✓${colors.reset} Total WebP: ${colors.yellow}${formatBytes(totalWebPSize)}${colors.reset} ${colors.green}(${savingsPercent}% smaller)${colors.reset}`,
     )
     console.log(
-        `  ${colors.green}✓${colors.reset} All variants: ${colors.yellow}${formatBytes(allVariantsSize)}${colors.reset}`
+        `  ${colors.green}✓${colors.reset} All variants: ${colors.yellow}${formatBytes(allVariantsSize)}${colors.reset}`,
     )
 }
 
@@ -224,9 +217,7 @@ ${colors.reset}`)
             return
         }
 
-        console.log(
-            `${colors.cyan}Found ${pngFiles.length} PNG files to process${colors.reset}`
-        )
+        console.log(`${colors.cyan}Found ${pngFiles.length} PNG files to process${colors.reset}`)
 
         // Process each image
         let totalOriginalSize = 0

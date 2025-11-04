@@ -7,7 +7,14 @@ interface TourCardProps extends TourSection {
     isFirstCard?: boolean // Flag to identify first card for priority loading
 }
 
-export default function TourCard({ title, description, image, imagePosition, cta, isFirstCard = false }: TourCardProps) {
+export default function TourCard({
+    title,
+    description,
+    image,
+    imagePosition,
+    cta,
+    isFirstCard = false,
+}: TourCardProps) {
     const isImageRight = imagePosition === 'right'
 
     // Get responsive image URLs from CDN
