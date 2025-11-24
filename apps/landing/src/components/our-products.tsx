@@ -1,8 +1,10 @@
 'use client'
 import { motion } from 'framer-motion'
 import { GlowingEffect } from '@workspace/ui/components/ui/glowing-effect'
+import { HoverBorderButton } from '@workspace/ui/components/ui/hover-border-button'
 import { Home, Utensils, Bath, Bed, Package, Sparkles, ShoppingCart } from 'lucide-react'
 import BackgroundOrnament from '@/components/decorators/background-ornament'
+import { BUTTON_VARIANTS } from '@/config/button-variants'
 
 export default function OurProducts() {
     return (
@@ -46,15 +48,17 @@ export default function OurProducts() {
                     transition={{ delay: 0.3 }}
                     className="text-center mt-16"
                 >
-                    <a
-                        href="https://shopee.vn/ecomate"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition-all hover:scale-105"
-                    >
-                        <ShoppingCart className="w-5 h-5" />
-                        Xem tất cả sản phẩm trên Shopee
-                    </a>
+                    <HoverBorderButton {...BUTTON_VARIANTS.primary}>
+                        <HoverBorderButton.Link
+                            href="https://shopee.vn/ecomate"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition-all hover:scale-105"
+                        >
+                            <ShoppingCart className="w-5 h-5" />
+                            Xem tất cả sản phẩm trên Shopee
+                        </HoverBorderButton.Link>
+                    </HoverBorderButton>
                 </motion.div>
             </div>
         </section>

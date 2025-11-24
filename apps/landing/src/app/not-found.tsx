@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { HoverBorderButton } from '@workspace/ui/components/ui/hover-border-button'
 import RadialGlowDecorator from '@/components/decorators/radial-glow'
 import { Home, Package } from 'lucide-react'
+import { BUTTON_VARIANTS } from '@/config/button-variants'
 
 export default function NotFound() {
     return (
@@ -139,12 +140,15 @@ export default function NotFound() {
                         </HoverBorderButton.Link>
                     </HoverBorderButton>
 
-                    <Link href="/#products">
-                        <button className="px-8 py-3 rounded-xl font-semibold text-base border-2 border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all duration-300 flex items-center gap-2">
+                    <HoverBorderButton {...BUTTON_VARIANTS.secondary}>
+                        <HoverBorderButton.Link
+                            href="/#products"
+                            className="px-8 py-3 rounded-xl font-semibold text-base border-2 border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all duration-300 flex items-center gap-2"
+                        >
                             <Package className="w-5 h-5" />
                             Khám phá sản phẩm
-                        </button>
-                    </Link>
+                        </HoverBorderButton.Link>
+                    </HoverBorderButton>
                 </motion.div>
 
                 {/* Additional Links */}
