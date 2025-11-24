@@ -1,17 +1,17 @@
 import { Providers } from '@workspace/shared/providers'
 import '@workspace/ui/globals.css'
-import { Open_Sans } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import type { Metadata } from 'next'
 import SeoJsonLd from '@/components/SeoJsonLd'
 import { TwentyFirstToolbar } from '@21st-extension/toolbar-next'
 import { ReactPlugin } from '@21st-extension/react'
 import SplashCursor from '@workspace/ui/components/SplashCursor'
 
-const openSans = Open_Sans({
+const inter = Inter({
     subsets: ['latin', 'vietnamese'],
     display: 'swap',
-    variable: '--font-open-sans',
-    weight: ['400', '700'],
+    variable: '--font-inter',
+    weight: ['300', '400', '500', '600', '700', '800', '900'],
     preload: true,
 })
 
@@ -148,7 +148,7 @@ export default function RootLayout({
     return (
         <html lang="vi" translate="no" suppressHydrationWarning>
             <body
-                className={`${openSans.variable} font-sans antialiased bg-gradient-to-br from-[#dee1e1] to-[#f4f4f4] text-slate-900 selection:bg-emerald-200`}
+                className={`${inter.variable} font-sans antialiased bg-gradient-to-br from-[#dee1e1] to-[#f4f4f4] text-slate-900 selection:bg-emerald-200`}
                 suppressHydrationWarning
             >
                 {/* Splash Cursor Effect */}
