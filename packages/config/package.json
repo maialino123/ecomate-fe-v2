@@ -15,7 +15,10 @@
     "typescript": "^5.9.2"
   },
   "exports": {
+    ".": "./src/index.ts",
     "./env": "./src/env.ts",
-    "./constants": "./src/constants.ts"
+    "./constants": "./src/constants.ts",
+    "./typography": "./src/typography.ts",
+    "./typography-variants": "./src/typography-variants.ts"
   }
 }
