@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore, UserRole } from '@workspace/lib/stores'
+import { useHydration } from '@workspace/shared/hooks'
 import { Loader2 } from 'lucide-react'
 
 interface ProtectedRouteProps {
@@ -13,24 +14,27 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requiredRoles, redirectTo = '/login' }: ProtectedRouteProps) {
     const router = useRouter()
+    const isHydrated = useHydration()
     const { isAuthenticated, user, isLoading } = useAuthStore()
 
     useEffect(() => {
-        if (!isLoading && !isAuthenticated) {
+        // Only redirect after hydration completes to avoid race condition
+        if (isHydrated && !isLoading && !isAuthenticated) {
             router.push(redirectTo)
         }
-    }, [isAuthenticated, isLoading, router, redirectTo])
+    }, [isHydrated, isAuthenticated, isLoading, router, redirectTo])
 
     useEffect(() => {
-        if (!isLoading && isAuthenticated && user && requiredRoles) {
+        if (isHydrated && !isLoading && isAuthenticated && user && requiredRoles) {
             const hasRequiredRole = requiredRoles.includes(user.role)
             if (!hasRequiredRole) {
                 router.push('/unauthorized')
             }
         }
-    }, [isAuthenticated, isLoading, user, requiredRoles, router])
+    }, [isHydrated, isAuthenticated, isLoading, user, requiredRoles, router])
 
-    if (isLoading) {
+    // Wait for hydration before checking auth state
+    if (!isHydrated || isLoading) {
         return (
             <div className="flex min-h-screen items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-500" />

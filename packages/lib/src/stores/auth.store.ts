@@ -17,6 +17,10 @@ export interface User {
     updatedAt: string
 }
 
+/**
+ * Auth tokens - only used for extension (header-based auth)
+ * Web apps use HttpOnly cookies instead
+ */
 export interface AuthTokens {
     accessToken: string
     refreshToken: string
@@ -24,12 +28,14 @@ export interface AuthTokens {
 
 interface AuthState {
     user: User | null
+    /** Tokens for extension mode. Web apps use HttpOnly cookies instead */
     tokens: AuthTokens | null
     isAuthenticated: boolean
     isLoading: boolean
 
     // Actions
     setUser: (user: User | null) => void
+    /** Set tokens - only for extension mode */
     setTokens: (tokens: AuthTokens | null) => void
     setLoading: (loading: boolean) => void
     logout: () => void
@@ -74,9 +80,11 @@ export const useAuthStore = create<AuthState>()(
         }),
         {
             name: 'ecomate-auth-storage',
+            // Only persist user info - tokens are handled by HttpOnly cookies for web apps
+            // Extension uses Authorization header with tokens from its own storage
             partialize: state => ({
                 user: state.user,
-                tokens: state.tokens,
+                // tokens: NOT persisted - web uses cookies, extension manages its own storage
                 isAuthenticated: state.isAuthenticated,
             }),
         },
