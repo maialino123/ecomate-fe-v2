@@ -4,6 +4,8 @@ import { Facebook, ShoppingBag, Send, Mail, Phone, MapPin } from 'lucide-react'
 import { useState } from 'react'
 import Image from 'next/image'
 import logo from '@/../public/images/logo.png'
+import { HoverBorderButton } from '@workspace/ui/components/ui/hover-border-button'
+import { BUTTON_VARIANTS } from '@/config/button-variants'
 
 export default function Footer() {
     const [email, setEmail] = useState('')
@@ -133,13 +135,15 @@ export default function Footer() {
                                     required
                                 />
                             </div>
-                            <button
-                                type="submit"
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-slate-900 rounded-lg hover:bg-emerald-700 transition-colors text-body font-medium"
-                            >
-                                <Send className="h-4 w-4" />
-                                Gửi tin nhắn
-                            </button>
+                            <HoverBorderButton {...BUTTON_VARIANTS.primary}>
+                                <HoverBorderButton.Button
+                                    type="submit"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-slate-900 rounded-lg hover:bg-emerald-700 transition-colors text-body font-medium"
+                                >
+                                    <Send className="h-4 w-4" />
+                                    Gửi tin nhắn
+                                </HoverBorderButton.Button>
+                            </HoverBorderButton>
                         </form>
                     </motion.div>
                 </div>

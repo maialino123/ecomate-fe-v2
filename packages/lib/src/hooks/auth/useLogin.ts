@@ -12,9 +12,11 @@ interface UseLoginOptions {
     }
     onSuccess?: (data: SignInResponse) => void
     onError?: (error: unknown) => void
+    /** Store tokens in Zustand (for extension). Web apps use HttpOnly cookies instead */
+    storeTokens?: boolean
 }
 
-export function useLogin({ api, onSuccess, onError }: UseLoginOptions) {
+export function useLogin({ api, onSuccess, onError, storeTokens = false }: UseLoginOptions) {
     const { setUser, setTokens } = useAuthStore()
     // Reserved for future error handling
     const { error: _showError } = useNotificationStore()
@@ -28,15 +30,20 @@ export function useLogin({ api, onSuccess, onError }: UseLoginOptions) {
                 return
             }
 
-            // Normal login - set tokens and user
-            if (data.accessToken && data.refreshToken && data.user) {
+            // Set user info (always needed for UI)
+            if (data.user) {
+                setUser(data.user)
+            }
+
+            // Store tokens only for extension mode (web uses HttpOnly cookies)
+            if (storeTokens && data.accessToken && data.refreshToken) {
                 setTokens({
                     accessToken: data.accessToken,
                     refreshToken: data.refreshToken,
                 })
-                setUser(data.user)
-                onSuccess?.(data)
             }
+
+            onSuccess?.(data)
         },
         onError: error => {
             try {

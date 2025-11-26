@@ -2,28 +2,56 @@ import axios, { AxiosInstance, AxiosError } from 'axios'
 
 export interface ApiClientConfig {
     baseURL: string
+    /** For extension: provide token getter. For web: leave undefined to use cookies */
     getAccessToken?: () => string | null
+    /** For extension: provide token getter. For web: leave undefined to use cookies */
     getRefreshToken?: () => string | null
+    /** For extension: callback when tokens refresh. For web: not needed (cookies auto-update) */
     onTokenRefresh?: (tokens: { accessToken: string; refreshToken: string }) => void
     onUnauthorized?: () => void
+    /** Use cookie-based auth (default: true for web, false for extension) */
+    useCookies?: boolean
+}
+
+/**
+ * Read CSRF token from cookie (for web apps with cookie auth)
+ */
+export function getCsrfToken(): string | null {
+    if (typeof document === 'undefined') return null
+    const match = document.cookie.match(/(?:^|; )csrf-token=([^;]*)/)
+    return match ? match[1] ?? null : null
 }
 
 export function createApiClient(config: ApiClientConfig): AxiosInstance {
+    // Default to cookie auth for web (no token getters provided)
+    const useCookies = config.useCookies ?? !config.getAccessToken
+
     const client = axios.create({
         baseURL: config.baseURL,
         timeout: 30000,
+        withCredentials: useCookies, // Send cookies with requests for web apps
         headers: {
             'Content-Type': 'application/json',
         },
     })
 
-    // Request interceptor - Add auth token
+    // Request interceptor - Add auth token and CSRF token
     client.interceptors.request.use(
         requestConfig => {
+            // For extension: use Authorization header
             const token = config.getAccessToken?.()
             if (token) {
                 requestConfig.headers.Authorization = `Bearer ${token}`
             }
+
+            // For web with cookies: add CSRF token to non-GET requests
+            if (useCookies && requestConfig.method !== 'get') {
+                const csrfToken = getCsrfToken()
+                if (csrfToken) {
+                    requestConfig.headers['X-CSRF-Token'] = csrfToken
+                }
+            }
+
             return requestConfig
         },
         error => Promise.reject(error),
@@ -89,9 +117,10 @@ export function createApiClient(config: ApiClientConfig): AxiosInstance {
             originalRequest._retry = true
             isRefreshing = true
 
-            // Check if refresh token exists before attempting refresh
+            // For cookie-based auth, we can always try refresh (cookie is sent automatically)
+            // For header-based auth (extension), check if refresh token exists
             const refreshToken = config.getRefreshToken?.()
-            if (!refreshToken) {
+            if (!useCookies && !refreshToken) {
                 console.warn('[API Client] No refresh token available - user needs to login')
                 processQueue(new Error('No refresh token'))
                 isRefreshing = false
@@ -101,20 +130,28 @@ export function createApiClient(config: ApiClientConfig): AxiosInstance {
 
             try {
                 // Call refresh endpoint
+                // For cookies: send empty body, server reads from cookie
+                // For extension: send token in body
                 console.log('[API Client] Calling refresh endpoint...')
-                const response = await axios.post(`${config.baseURL}/v1/auth/refresh`, {
-                    refreshToken,
-                })
+                const response = await axios.post(
+                    `${config.baseURL}/v1/auth/refresh`,
+                    useCookies ? {} : { refreshToken },
+                    { withCredentials: useCookies },
+                )
 
                 const { accessToken, refreshToken: newRefreshToken } = response.data
 
                 console.log('[API Client] Token refresh successful')
 
-                // Update tokens
-                config.onTokenRefresh?.({ accessToken, refreshToken: newRefreshToken })
+                // Update tokens (only for extension mode)
+                if (!useCookies && config.onTokenRefresh) {
+                    config.onTokenRefresh({ accessToken, refreshToken: newRefreshToken })
+                }
 
-                // Update authorization header
-                originalRequest.headers.Authorization = `Bearer ${accessToken}`
+                // Update authorization header (only for extension mode)
+                if (!useCookies) {
+                    originalRequest.headers.Authorization = `Bearer ${accessToken}`
+                }
 
                 processQueue()
                 isRefreshing = false

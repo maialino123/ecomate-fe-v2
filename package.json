@@ -4,10 +4,15 @@
     "private": true,
     "scripts": {
         "build": "turbo build",
+        "build:log": "powershell -Command \"$OutputEncoding = [Console]::OutputEncoding = [Text.Encoding]::UTF8; '[' + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + '] Starting build...' | Out-File -Encoding utf8 logs.txt; turbo build 2>&1 | Out-File -Encoding utf8 -Append logs.txt\"",
         "dev": "turbo dev",
+        "dev:log": "powershell -Command \"$OutputEncoding = [Console]::OutputEncoding = [Text.Encoding]::UTF8; '[' + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + '] Starting dev...' | Out-File -Encoding utf8 logs.txt; turbo dev 2>&1 | Out-File -Encoding utf8 -Append logs.txt\"",
         "lint": "turbo lint",
+        "lint:log": "powershell -Command \"$OutputEncoding = [Console]::OutputEncoding = [Text.Encoding]::UTF8; '[' + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + '] Starting lint...' | Out-File -Encoding utf8 logs.txt; turbo lint 2>&1 | Out-File -Encoding utf8 -Append logs.txt\"",
         "typecheck": "turbo typecheck",
+        "typecheck:log": "powershell -Command \"$OutputEncoding = [Console]::OutputEncoding = [Text.Encoding]::UTF8; '[' + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + '] Starting typecheck...' | Out-File -Encoding utf8 logs.txt; turbo typecheck 2>&1 | Out-File -Encoding utf8 -Append logs.txt\"",
         "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+        "format:log": "powershell -Command \"$OutputEncoding = [Console]::OutputEncoding = [Text.Encoding]::UTF8; '[' + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + '] Starting format...' | Out-File -Encoding utf8 logs.txt; prettier --write '**/*.{ts,tsx,md}' 2>&1 | Out-File -Encoding utf8 -Append logs.txt\"",
         "prepare": "lefthook install"
     },
     "devDependencies": {
