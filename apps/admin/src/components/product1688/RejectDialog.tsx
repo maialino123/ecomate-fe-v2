@@ -39,45 +39,45 @@ export function RejectDialog({ product, onSuccess }: RejectDialogProps) {
     <>
       <Button onClick={() => setIsOpen(true)} variant="destructive" size="sm">
         <XCircle className="w-4 h-4 mr-2" />
-        Reject
+        Từ chối
       </Button>
 
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4 text-red-600 dark:text-red-400">Reject Product</h3>
+            <h3 className="text-lg font-semibold mb-4 text-red-600 dark:text-red-400">Từ chối sản phẩm</h3>
 
             <div className="mb-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                <strong>Product:</strong> {product.nameVi || product.nameZh}
+                <strong>Sản phẩm:</strong> {product.nameVi || product.nameZh}
               </p>
             </div>
 
             <div className="space-y-4 mb-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Rejection Reason</label>
+                <label className="block text-sm font-medium mb-2">Lý do từ chối</label>
                 <select
                   value={reason}
                   onChange={e => setReason(e.target.value as RejectionReason)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
                 >
-                  <option value={RejectionReason.LOW_QUALITY}>Low Quality</option>
-                  <option value={RejectionReason.TOO_EXPENSIVE}>Too Expensive</option>
-                  <option value={RejectionReason.ALREADY_HAVE}>Already Have</option>
-                  <option value={RejectionReason.NOT_SUITABLE}>Not Suitable</option>
-                  <option value={RejectionReason.SUPPLIER_ISSUES}>Supplier Issues</option>
-                  <option value={RejectionReason.OTHER}>Other</option>
+                  <option value={RejectionReason.LOW_QUALITY}>Chất lượng thấp</option>
+                  <option value={RejectionReason.TOO_EXPENSIVE}>Giá quá cao</option>
+                  <option value={RejectionReason.ALREADY_HAVE}>Đã có sản phẩm tương tự</option>
+                  <option value={RejectionReason.NOT_SUITABLE}>Không phù hợp</option>
+                  <option value={RejectionReason.SUPPLIER_ISSUES}>Vấn đề nhà cung cấp</option>
+                  <option value={RejectionReason.OTHER}>Khác</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Additional Notes (Optional)</label>
+                <label className="block text-sm font-medium mb-2">Ghi chú thêm (Tùy chọn)</label>
                 <textarea
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
                   rows={3}
-                  placeholder="Provide additional details about the rejection..."
+                  placeholder="Cung cấp thêm chi tiết về lý do từ chối..."
                 />
               </div>
             </div>
@@ -90,7 +90,7 @@ export function RejectDialog({ product, onSuccess }: RejectDialogProps) {
                 className="flex-1"
               >
                 {rejectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Reject
+                Từ chối
               </Button>
               <Button
                 onClick={() => {
@@ -101,7 +101,7 @@ export function RejectDialog({ product, onSuccess }: RejectDialogProps) {
                 variant="outline"
                 className="flex-1"
               >
-                Cancel
+                Hủy
               </Button>
             </div>
           </div>

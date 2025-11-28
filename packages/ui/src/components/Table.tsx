@@ -46,7 +46,7 @@ function Table({ className, containerClassName, ...props }: TableProps) {
                 <table
                     ref={tableRef}
                     data-slot="table"
-                    className={cn('group w-full caption-bottom text-sm', className)}
+                    className={cn('group w-full caption-bottom text-sm table-fixed', className)}
                     {...props}
                 />
             </div>
@@ -109,7 +109,7 @@ function TableCell({ className, ...props }: React.ComponentProps<'td'>) {
         <td
             data-slot="table-cell"
             className={cn(
-                'p-3 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] truncate bg-inherit',
+                'p-3 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] overflow-hidden text-ellipsis bg-inherit',
                 className,
             )}
             {...props}

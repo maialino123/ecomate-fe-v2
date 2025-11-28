@@ -1,4 +1,5 @@
 export { useProduct1688List } from './useProduct1688List'
+export { useProduct1688Prefetch } from './useProduct1688Prefetch'
 export { useProduct1688Detail } from './useProduct1688Detail'
 export { useProduct1688Translate } from './useProduct1688Translate'
 export { useProduct1688Approve } from './useProduct1688Approve'
