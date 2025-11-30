@@ -179,6 +179,7 @@ function DataTable<TData extends Identifiable, TValue>({
                                 <TableHead
                                     key={header.id}
                                     style={{
+                                        width: header.column.columnDef.size,
                                         minWidth: header.column.columnDef.size,
                                         maxWidth: header.column.columnDef.size,
                                     }}
@@ -228,6 +229,7 @@ function DataTable<TData extends Identifiable, TValue>({
                                 <TableCell
                                     key={cell.id}
                                     style={{
+                                        width: cell.column.columnDef.size,
                                         minWidth: cell.column.columnDef.size,
                                         maxWidth: cell.column.columnDef.size,
                                     }}

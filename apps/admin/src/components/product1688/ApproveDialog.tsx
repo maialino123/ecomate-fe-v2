@@ -44,20 +44,20 @@ export function ApproveDialog({ product, onSuccess }: ApproveDialogProps) {
     <>
       <Button onClick={() => setIsOpen(true)} variant="default" size="sm">
         <CheckCircle className="w-4 h-4 mr-2" />
-        Approve
+        Duyệt
       </Button>
 
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4 text-green-600 dark:text-green-400">Approve Product</h3>
+            <h3 className="text-lg font-semibold mb-4 text-green-600 dark:text-green-400">Duyệt sản phẩm</h3>
 
             <div className="mb-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                <strong>Product:</strong> {product.nameVi || product.nameZh}
+                <strong>Sản phẩm:</strong> {product.nameVi || product.nameZh}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                <strong>Price:</strong> {product.priceMinCNY} CNY
+                <strong>Giá:</strong> {product.priceMinCNY} CNY
                 {product.priceMaxCNY && ` - ${product.priceMaxCNY} CNY`}
               </p>
             </div>
@@ -65,13 +65,13 @@ export function ApproveDialog({ product, onSuccess }: ApproveDialogProps) {
             <div className="space-y-4 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  SKU <span className="text-red-500">*</span>
+                  Mã SKU <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={sku}
                   onChange={e => setSku(e.target.value)}
-                  placeholder="e.g., SKU-1688-001"
+                  placeholder="VD: SKU-1688-001"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
                   required
                 />
@@ -79,25 +79,25 @@ export function ApproveDialog({ product, onSuccess }: ApproveDialogProps) {
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Category ID <span className="text-red-500">*</span>
+                  Mã danh mục <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={categoryId}
                   onChange={e => setCategoryId(e.target.value)}
-                  placeholder="Select from existing categories"
+                  placeholder="Chọn từ danh mục có sẵn"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Supplier ID (Optional)</label>
+                <label className="block text-sm font-medium mb-2">Mã nhà cung cấp (Tùy chọn)</label>
                 <input
                   type="text"
                   value={supplierId}
                   onChange={e => setSupplierId(e.target.value)}
-                  placeholder="Link to existing supplier"
+                  placeholder="Liên kết nhà cung cấp"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
                 />
               </div>
@@ -106,7 +106,7 @@ export function ApproveDialog({ product, onSuccess }: ApproveDialogProps) {
             <div className="flex gap-2">
               <Button onClick={handleApprove} isDisabled={!sku || !categoryId || approveMutation.isPending} className="flex-1">
                 {approveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Approve & Import
+                Duyệt & Nhập
               </Button>
               <Button
                 onClick={() => {
@@ -118,7 +118,7 @@ export function ApproveDialog({ product, onSuccess }: ApproveDialogProps) {
                 variant="outline"
                 className="flex-1"
               >
-                Cancel
+                Hủy
               </Button>
             </div>
           </div>

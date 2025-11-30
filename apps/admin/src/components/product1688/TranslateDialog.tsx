@@ -25,8 +25,8 @@ export function TranslateDialog({ productId, productName, onSuccess }: Translate
   const handleTranslate = () => {
     // Show start notification
     info(
-      `Translation started${productName ? ` for ${productName}` : ''}`,
-      'Translation In Progress'
+      `Bắt đầu dịch${productName ? ` cho ${productName}` : ''}`,
+      'Đang dịch'
     )
 
     // Trigger translation without confirmation
@@ -38,7 +38,7 @@ export function TranslateDialog({ productId, productName, onSuccess }: Translate
     const progress = (translateMutation.data as any)?.progress
     const progressText = progress
       ? `${progress.completed}/${progress.total}`
-      : 'Processing...'
+      : 'Đang xử lý...'
 
     return (
       <Badge
@@ -46,7 +46,7 @@ export function TranslateDialog({ productId, productName, onSuccess }: Translate
         className="flex items-center gap-1.5 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 animate-pulse"
       >
         <Loader2 className="w-3 h-3 animate-spin" />
-        <span className="text-xs font-medium">Translating {progressText}</span>
+        <span className="text-xs font-medium">Đang dịch {progressText}</span>
       </Badge>
     )
   }
@@ -56,10 +56,10 @@ export function TranslateDialog({ productId, productName, onSuccess }: Translate
     <button
       onClick={handleTranslate}
       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 border border-blue-600 dark:border-blue-400 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-      title="Translate to Vietnamese"
+      title="Dịch sang tiếng Việt"
     >
       <Languages className="w-4 h-4" />
-      <span>Translate</span>
+      <span>Dịch</span>
     </button>
   )
 }
