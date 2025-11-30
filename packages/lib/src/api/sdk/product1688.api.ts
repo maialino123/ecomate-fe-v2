@@ -15,6 +15,7 @@ import {
   SaveCostCalculationRequest,
   SaveCostCalculationResponse,
   VariantCostHistoryResponse,
+  ExportProduct1688Request,
 } from '../../types/product1688.types';
 
 /**
@@ -133,6 +134,17 @@ export class Product1688Api {
     const response = await this.client.get<VariantCostHistoryResponse>(
       `/v1/1688-products/${productId}/variant-cost/${encodeURIComponent(variantSku)}`
     );
+    return response.data;
+  }
+
+  /**
+   * Export products to Excel
+   * Returns a Blob for file download
+   */
+  async exportToExcel(data: ExportProduct1688Request): Promise<Blob> {
+    const response = await this.client.post('/v1/1688-products/export', data, {
+      responseType: 'blob',
+    });
     return response.data;
   }
 }
