@@ -25,6 +25,8 @@ const DEFAULT_VALUES: CostFormData = {
     returnRate: 0.05,
     platformFeeRate: 0.2,
     profitMarginRate: 0.15,
+    marketingCostVND: 0,
+    marketingRate: 0.1,
 }
 
 export function CostCalculationForm({ onCalculationResult, onCalculationLoading }: CostCalculationFormProps) {
@@ -43,7 +45,7 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
     // Debounce form values to avoid too many calculations
     const debouncedValues = useDebounce(formValues, 500)
 
-    // Client-side calculation function
+    // Client-side calculation function (with marketing costs)
     const calculatePrice = (dto: CalculatePriceDto): PriceCalculationResult | null => {
         try {
             // Input validation
@@ -55,11 +57,16 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
             const domesticShippingCN = dto.domesticShippingCN || 0
             const internationalShippingVN = dto.internationalShippingVN || 0
             const handlingFee = dto.handlingFee || 0
+            const marketingCostVND = dto.marketingCostVND || 0
             const exchangeRateCNY = dto.exchangeRateCNY || 3600
             const quantity = dto.quantity || 1
             const returnRate = dto.returnRate || 0
             const platformFeeRate = dto.platformFeeRate || 0
             const profitMarginRate = dto.profitMarginRate || 0
+            const marketingRate = dto.marketingRate || 0
+
+            // Calculate total fee rate (platform + marketing)
+            const totalFeeRate = platformFeeRate + marketingRate
 
             // Step 1: Total CNY cost
             const totalCNYCost = importPrice + domesticShippingCN
@@ -67,33 +74,31 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
             // Step 2: Convert to VND
             const totalCNYInVND = totalCNYCost * exchangeRateCNY
 
-            // Step 3: Total VND cost
-            const totalVNDCost = totalCNYInVND + internationalShippingVN + handlingFee
+            // Step 3: Total VND cost (including fixed marketing cost)
+            const totalVNDCost = totalCNYInVND + internationalShippingVN + handlingFee + marketingCostVND
 
             // Step 4: Base cost per unit (C₀)
             const baseCost = totalVNDCost / quantity
 
             // Step 5: Effective cost with return rate (C_eff)
-            // Guard: returnRate cannot be 100% (would cause division by zero)
             if (returnRate >= 1) {
                 console.error('Return rate cannot be 100% or higher')
                 return null
             }
             const effectiveCost = baseCost / (1 - returnRate)
 
-            // Step 6: Suggested selling price (P)
-            // Guard: platformFeeRate cannot be 100% (would cause division by zero)
-            if (platformFeeRate >= 1) {
-                console.error('Platform fee rate cannot be 100% or higher')
+            // Step 6: Suggested selling price (P) - now with totalFeeRate
+            if (totalFeeRate >= 1) {
+                console.error('Total fee rate (platform + marketing) cannot be 100% or higher')
                 return null
             }
-            const suggestedSellingPrice = (effectiveCost * (1 + profitMarginRate)) / (1 - platformFeeRate)
+            const suggestedSellingPrice = (effectiveCost * (1 + profitMarginRate)) / (1 - totalFeeRate)
 
-            // Step 7: Net profit per unit (L)
-            const netProfit = suggestedSellingPrice * (1 - platformFeeRate) - effectiveCost
+            // Step 7: Net profit per unit (L) - deduct both platform and marketing fees
+            const netProfit = suggestedSellingPrice * (1 - totalFeeRate) - effectiveCost
 
             // Step 8: Break-even price (P_BE)
-            const breakEvenPrice = effectiveCost / (1 - platformFeeRate)
+            const breakEvenPrice = effectiveCost / (1 - totalFeeRate)
 
             return {
                 baseCost,
@@ -107,11 +112,13 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                         domesticShippingCNY: domesticShippingCN,
                         internationalShippingVND: internationalShippingVN,
                         handlingFeeVND: handlingFee,
+                        marketingCostVND,
                         exchangeRateCNY,
                         quantity,
                         returnRate,
                         platformFeeRate,
                         profitMarginRate,
+                        marketingRate,
                     },
                     steps: {
                         totalCNYCost,
@@ -119,7 +126,8 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                         totalVNDCost,
                         baseCostPerUnit: baseCost,
                         effectiveCostPerUnit: effectiveCost,
-                        priceBeforePlatformFee: suggestedSellingPrice * (1 - platformFeeRate),
+                        totalFeeRate,
+                        priceBeforeFees: suggestedSellingPrice * (1 - totalFeeRate),
                         suggestedPrice: suggestedSellingPrice,
                         netProfitPerUnit: netProfit,
                         breakEvenPrice,
@@ -127,6 +135,8 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                     percentages: {
                         profitMarginPercentage: (netProfit / effectiveCost) * 100,
                         platformFeePercentage: platformFeeRate * 100,
+                        marketingRatePercentage: marketingRate * 100,
+                        totalFeePercentage: totalFeeRate * 100,
                         returnRatePercentage: returnRate * 100,
                     },
                 },
@@ -225,7 +235,57 @@ export function CostCalculationForm({ onCalculationResult, onCalculationLoading 
                     />
                 </div>
 
-                {/* Section 3: Exchange Rate & Quantity */}
+                {/* Section 3: Marketing Costs */}
+                <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="h-1 w-1 rounded-full bg-pink-500"></div>
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            Chi phí Marketing
+                        </h4>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <CurrencyInput
+                            currency="VND"
+                            label="Chi phí marketing cố định"
+                            placeholder="500000"
+                            helperText="Chi phí quảng cáo cố định cho cả lô hàng (VND)"
+                            {...register('marketingCostVND', {
+                                min: { value: 0, message: 'Chi phí phải >= 0' },
+                                valueAsNumber: true,
+                            })}
+                            error={errors.marketingCostVND?.message}
+                        />
+
+                        <div className="space-y-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Tỷ lệ marketing (% giá bán)
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    max="0.99"
+                                    className="block w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 dark:focus:ring-pink-400 focus:border-pink-500 dark:focus:border-pink-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                                    placeholder="0.10"
+                                    {...register('marketingRate', {
+                                        min: { value: 0, message: 'Phải >= 0' },
+                                        max: { value: 0.99, message: 'Phải < 100%' },
+                                        valueAsNumber: true,
+                                    })}
+                                />
+                                <span className="absolute right-3 top-2.5 text-gray-500 dark:text-gray-400 text-sm">%</span>
+                            </div>
+                            {errors.marketingRate && (
+                                <p className="text-xs text-red-600 dark:text-red-400">{errors.marketingRate.message}</p>
+                            )}
+                            <p className="text-xs text-gray-500 dark:text-gray-400">0.10 = 10% trên giá bán</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Section 4: Exchange Rate & Quantity */}
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 mb-3">
                         <div className="h-1 w-1 rounded-full bg-purple-500"></div>

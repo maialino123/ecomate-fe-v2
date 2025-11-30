@@ -184,6 +184,30 @@ export function CalculationResult({ result, loading }: CalculationResultProps) {
                                 {result.calculationBreakdown.percentages.platformFeePercentage.toFixed(2)}%
                             </span>
                         </div>
+                        <div className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-400">Tỷ lệ marketing</span>
+                            <span className="font-mono text-gray-900 dark:text-white">
+                                {result.calculationBreakdown.percentages.marketingRatePercentage.toFixed(2)}%
+                            </span>
+                        </div>
+                        <div className="flex justify-between font-semibold">
+                            <span className="text-gray-700 dark:text-gray-300">Tổng phí (sàn + marketing)</span>
+                            <span className="font-mono text-pink-600 dark:text-pink-400">
+                                {result.calculationBreakdown.percentages.totalFeePercentage.toFixed(2)}%
+                            </span>
+                        </div>
+                        {result.calculationBreakdown.inputs.marketingCostVND > 0 && (
+                            <div className="flex justify-between">
+                                <span className="text-gray-600 dark:text-gray-400">Chi phí marketing cố định</span>
+                                <span className="font-mono text-gray-900 dark:text-white">
+                                    {new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND',
+                                        minimumFractionDigits: 0,
+                                    }).format(result.calculationBreakdown.inputs.marketingCostVND)}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

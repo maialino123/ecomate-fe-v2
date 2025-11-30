@@ -21,6 +21,10 @@ export interface CalculatePriceDto {
     returnRate?: number // R: Tỷ lệ hoàn hàng (0.05 = 5%)
     platformFeeRate?: number // F: Phí sàn TMĐT (0.20 = 20%)
     profitMarginRate?: number // G: Biên lợi nhuận mong muốn (0.15 = 15%)
+
+    // Marketing costs (Chi phí marketing)
+    marketingCostVND?: number // M_fixed: Chi phí marketing cố định cho lô hàng (VND)
+    marketingRate?: number // M_rate: Tỷ lệ % marketing trên giá bán (0.10 = 10%)
 }
 
 /**
@@ -56,20 +60,23 @@ export interface PriceCalculationResult {
             domesticShippingCNY: number
             internationalShippingVND: number
             handlingFeeVND: number
+            marketingCostVND: number // M_fixed
             exchangeRateCNY: number
             quantity: number
             returnRate: number
             platformFeeRate: number
             profitMarginRate: number
+            marketingRate: number // M_rate
         }
         // Step by step calculation
         steps: {
             totalCNYCost: number // (P_nhập + P_shipTQ)
             totalCNYInVND: number // (P_nhập + P_shipTQ) × T_CNY→VND
-            totalVNDCost: number // Total in VND before division
+            totalVNDCost: number // Total in VND (including marketing) before division
             baseCostPerUnit: number // C₀
             effectiveCostPerUnit: number // C_eff
-            priceBeforePlatformFee: number // P × (1-F)
+            totalFeeRate: number // F + M_rate
+            priceBeforeFees: number // P × (1 - F - M_rate)
             suggestedPrice: number // P
             netProfitPerUnit: number // L
             breakEvenPrice: number // P_BE
@@ -78,6 +85,8 @@ export interface PriceCalculationResult {
         percentages: {
             profitMarginPercentage: number // (L / C_eff) × 100
             platformFeePercentage: number // F × 100
+            marketingRatePercentage: number // M_rate × 100
+            totalFeePercentage: number // (F + M_rate) × 100
             returnRatePercentage: number // R × 100
         }
     }
@@ -96,6 +105,7 @@ export interface CostCalculationResponse {
     domesticShippingCN: number
     internationalShippingVN: number
     handlingFee: number
+    marketingCostVND: number // M_fixed: Chi phí marketing cố định (VND)
 
     // Exchange rate and quantity
     exchangeRateCNY: number
@@ -105,6 +115,7 @@ export interface CostCalculationResponse {
     returnRate: number
     platformFeeRate: number
     profitMarginRate: number
+    marketingRate: number // M_rate: Tỷ lệ % marketing trên giá bán
 
     // Calculated results
     baseCost: number
