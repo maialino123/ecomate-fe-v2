@@ -2,16 +2,23 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import { useApi } from '@workspace/shared/providers'
-import { useProduct1688List, useProduct1688Prefetch, useProduct1688Translate } from '@workspace/lib'
+import {
+  useProduct1688List,
+  useProduct1688Prefetch,
+  useProduct1688Translate,
+  useProduct1688Export,
+} from '@workspace/lib'
 import { Button } from '@workspace/ui/components/Button'
 import { ProtectedRoute } from '../../../../lib/protected-route'
-import { useProduct1688TableState } from './_hooks'
+import { useProduct1688TableState, useExportWizard } from './_hooks'
 import {
   Product1688Table,
   product1688Columns,
   Product1688TablePagination,
   Product1688TableToolbar,
   Product1688BulkActions,
+  VariantSelectionModal,
+  PreExportSummaryTable,
 } from './_components'
 
 function Product1688ListPageContent() {
@@ -20,6 +27,18 @@ function Product1688ListPageContent() {
 
   // Use new table state hook
   const tableState = useProduct1688TableState()
+
+  // Export wizard state
+  const exportWizard = useExportWizard()
+
+  // Export mutation
+  const exportMutation = useProduct1688Export({
+    api,
+    onSuccess: () => {
+      exportWizard.closeWizard()
+      tableState.onRowSelectionChange({})
+    },
+  })
 
   // Existing data fetching hook (with performance optimizations)
   const { data, isLoading, error, refetch } = useProduct1688List({
@@ -39,6 +58,9 @@ function Product1688ListPageContent() {
     query: tableState.queryParams,
     hasNextPage,
   })
+
+  // Products list
+  const products = data?.data ?? []
 
   // Check if any filters are active
   const hasFilters = useMemo(() => {
@@ -87,6 +109,24 @@ function Product1688ListPageContent() {
     tableState.onRowSelectionChange({})
   }, [tableState])
 
+  // Handle export selected products
+  const handleExportSelected = useCallback(() => {
+    const selectedProducts = products.filter(p => selectedRowIds.includes(p.id))
+    if (selectedProducts.length > 0) {
+      exportWizard.openWizard(selectedProducts)
+    }
+  }, [products, selectedRowIds, exportWizard])
+
+  // Handle final export
+  const handleFinalExport = useCallback(() => {
+    const payload = exportWizard.getExportPayload()
+    if (payload.length > 0) {
+      exportMutation.mutate({
+        selections: payload,
+      })
+    }
+  }, [exportWizard, exportMutation])
+
   if (error) {
     return (
       <div className="text-center py-12">
@@ -97,8 +137,6 @@ function Product1688ListPageContent() {
       </div>
     )
   }
-
-  const products = data?.data ?? []
 
   return (
     <div className="space-y-6">
@@ -117,8 +155,10 @@ function Product1688ListPageContent() {
       <Product1688BulkActions
         selectedCount={selectedCount}
         onTranslateAll={handleBulkTranslate}
+        onExportSelected={handleExportSelected}
         onClearSelection={handleClearSelection}
         isTranslating={isBulkTranslating}
+        isExporting={exportMutation.isPending}
       />
 
       {/* TanStack Table */}
@@ -148,6 +188,35 @@ function Product1688ListPageContent() {
           totalRows={total}
         />
       </div>
+
+      {/* Export Wizard - Variant Selection Modal */}
+      <VariantSelectionModal
+        open={exportWizard.step === 'variant-selection'}
+        onClose={exportWizard.closeWizard}
+        products={exportWizard.products}
+        currentIndex={exportWizard.currentProductIndex}
+        variantSelections={exportWizard.variantSelections}
+        onVariantsChange={exportWizard.setVariants}
+        onNext={exportWizard.nextProduct}
+        onPrev={exportWizard.prevProduct}
+        onSkip={exportWizard.skipProduct}
+        onComplete={exportWizard.goToSummary}
+        isExporting={exportMutation.isPending}
+        isLastProduct={exportWizard.currentProductIndex === exportWizard.products.length - 1}
+      />
+
+      {/* Export Wizard - Pre-Export Summary */}
+      <PreExportSummaryTable
+        open={exportWizard.step === 'summary'}
+        onClose={exportWizard.closeWizard}
+        products={exportWizard.products}
+        variantSelections={exportWizard.variantSelections}
+        skippedProducts={exportWizard.skippedProducts}
+        onRemoveProduct={exportWizard.removeProduct}
+        onEditProduct={exportWizard.editProduct}
+        onExport={handleFinalExport}
+        isExporting={exportMutation.isPending}
+      />
     </div>
   )
 }

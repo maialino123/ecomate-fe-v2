@@ -270,3 +270,18 @@ export interface VariantCostHistoryResponse {
     total: number
     history: VariantCostHistoryItem[]
 }
+
+// Excel Export Types
+export interface VariantSelectionDto {
+    productId: string
+    variantSkus: string[]
+}
+
+export interface ExportProduct1688Request {
+    selections?: VariantSelectionDto[]
+    exportAll?: boolean
+    filters?: {
+        status?: Product1688Status
+        search?: string
+    }
+}
