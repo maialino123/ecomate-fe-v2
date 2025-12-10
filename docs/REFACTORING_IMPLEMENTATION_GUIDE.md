@@ -92,7 +92,10 @@ export function useFormSubmit<T extends Record<string, any>>(
       } catch (error) {
         // Catch any unhandled errors from form submission
         // This prevents ErrorBoundary from catching and refreshing the page
-        console.error('Form submission error:', error)
+        // Note: Use logger utility after implementing Task 3
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Form submission error:', error)
+        }
       }
     },
     [handleSubmit, onSubmit]
@@ -542,8 +545,8 @@ export function TranslationButton({
       variant={variant}
       size={size}
       className={className}
-      onPress={onTranslate}
-      isDisabled={isTranslating}
+      onClick={onTranslate}
+      disabled={isTranslating}
     >
       {isTranslating ? (
         <>
@@ -838,7 +841,7 @@ export function ApproveDialog({ product, onSuccess }: ApproveDialogProps) {
         <div className="flex gap-2 mt-4">
           <Button
             onClick={handleApprove}
-            isDisabled={!sku || !categoryId || approveMutation.isPending}
+            disabled={!sku || !categoryId || approveMutation.isPending}
             className="flex-1"
           >
             {approveMutation.isPending ? (
@@ -929,7 +932,10 @@ export function getApiClient(): Api {
       baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
       authStrategy: 'cookie',
       onUnauthorized: () => {
-        console.warn('[API Client] Session expired - logging out user')
+        // Note: Use logger utility after implementing Task 3
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[API Client] Session expired - logging out user')
+        }
         useAuthStore.getState().logout()
         if (typeof window !== 'undefined') {
           if (!window.location.pathname.includes('/login')) {

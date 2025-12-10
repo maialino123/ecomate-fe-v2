@@ -135,6 +135,8 @@ const handleFormSubmit = async (e: React.FormEvent) => {
 **Suggested Implementation:**
 ```typescript
 // packages/shared/src/hooks/useFormSubmit.ts
+import { logger } from '@workspace/shared/utils'
+
 export function useFormSubmit<T>(
   onSubmit: (data: T) => Promise<void>,
   handleSubmit: UseFormHandleSubmit<T>
@@ -145,7 +147,7 @@ export function useFormSubmit<T>(
     try {
       await handleSubmit(onSubmit)(e)
     } catch (error) {
-      console.error('Form submission error:', error)
+      logger.error('Form submission error', { error })
     }
   }, [handleSubmit, onSubmit])
 }
